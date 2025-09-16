@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mal Kabul Uygulaması</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="bg-gray-100 p-4 min-h-screen">
+  <div id="mainMenu">
+    <div class="grid grid-cols-2 gap-4 text-center">
+      <button class="bg-blue-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-blue-700 transition-colors" onclick="goTo('malKabulForm')">
+        <i data-lucide="package" class="w-8 h-8 mx-auto mb-2"></i><br>Mal Kabul
+      </button>
+      <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors" onclick="goTo('bekleyenIsler')">
+        <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2"></i><br>Bekleyen İşler
+      </button>
+      <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors" onclick="goTo('musteriler')">
+        <i data-lucide="users" class="w-8 h-8 mx-auto mb-2"></i><br>Müşteriler
+      </button>
+      <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors">
+        <i data-lucide="bar-chart-3" class="w-8 h-8 mx-auto mb-2"></i><br>Raporlar
+      </button>
+    </div>
+    
+  </div>
+
+  <!-- Mal Kabul Adım Adım Süreç -->
+  <div id="malKabulForm" class="hidden mt-6">
+    <!-- Progress Bar -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-medium text-gray-700">Adım <span id="currentStep">1</span> / 4</span>
+        <span class="text-sm text-gray-500" id="stepTitle">Müşteri Bilgileri</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <!-- Step 1: Müşteri Bilgileri -->
+    <div id="step1" class="step-content">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        Müşteri Bilgileri
+      </h2>
+      <div class="bg-white p-6 rounded-lg shadow space-y-4">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Ad Soyad *</label>
+          <input type="text" id="adsoyad" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Müşteri adı ve soyadı" required autocomplete="off">
+          <div id="customerSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Cep Telefonu *</label>
+          <input type="tel" id="cep" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="0555 123 45 67" required>
+        </div>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Alma Tarihi *</label>
+            <input type="date" id="almaTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Teslim Tarihi *</label>
+            <input type="date" id="teslimTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="goTo('mainMenu')">İptal</button>
+          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Ürün Detayları -->
+    <div id="step2" class="step-content hidden">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <i data-lucide="package" class="w-6 h-6"></i>
+        Ürün Detayları
+      </h2>
+      <div class="bg-white p-6 rounded-lg shadow space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Toplam Ağırlık (kg) *</label>
+          <input type="number" id="toplamKg" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Örn: 100" step="0.1" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Fiyat (₺) *</label>
+          <input type="number" id="fiyat" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Örn: 1500" step="0.01" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Açıklaması</label>
+          <textarea id="urunAciklama" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Ürün hakkında ek bilgiler..."></textarea>
+        </div>
+        <div class="flex gap-4">
+          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
+          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: İşlem Seçimi -->
+    <div id="step3" class="step-content hidden">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <i data-lucide="settings" class="w-6 h-6"></i>
+        İşlem Seçimi
+      </h2>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <p class="text-gray-700 mb-4">Toplam: <span id="kgBilgi" class="font-semibold text-blue-600"></span> kg fındık için işlem türlerini seçin:</p>
+        <div class="grid gap-3 mb-6">
+          <button class="bg-red-100 hover:bg-red-200 text-red-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('İşlenmeyecek')">
+            <div class="mb-2 flex justify-center">
+              <i data-lucide="x-circle" class="w-8 h-8"></i>
+            </div>
+            <div class="font-semibold">İşlenmeyecek</div>
+            <div class="text-sm text-red-600">Ham olarak teslim</div>
+          </button>
+          <button class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Kırma')">
+            <div class="mb-2 flex justify-center">
+              <i data-lucide="hammer" class="w-8 h-8"></i>
+            </div>
+            <div class="font-semibold">Kırma</div>
+            <div class="text-sm text-yellow-600">Kabuk kırma işlemi</div>
+          </button>
+          <button class="bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Kavurma')">
+            <div class="mb-2 flex justify-center">
+              <i data-lucide="flame" class="w-8 h-8"></i>
+            </div>
+            <div class="font-semibold">Kavurma</div>
+            <div class="text-sm text-orange-600">Kavurma işlemi</div>
+          </button>
+          <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Paketleme')">
+            <div class="mb-2 flex justify-center">
+              <i data-lucide="package-2" class="w-8 h-8"></i>
+            </div>
+            <div class="font-semibold">Paketleme</div>
+            <div class="text-sm text-blue-600">Paketleme işlemi</div>
+          </button>
+          <button class="bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Ezme')">
+            <div class="mb-2 flex justify-center">
+              <i data-lucide="zap" class="w-8 h-8"></i>
+            </div>
+            <div class="font-semibold">Ezme</div>
+            <div class="text-sm text-purple-600">Ezme işlemi</div>
+          </button>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-semibold mb-3 text-gray-800">Seçilen İşlemler:</h3>
+          <ul id="islemListesi" class="space-y-2">
+            <li class="text-gray-500 text-sm">Henüz işlem seçilmedi</li>
+          </ul>
+          <div class="mt-3 pt-3 border-t border-gray-200">
+            <p class="text-sm text-gray-600">Kalan: <span id="kalanKg" class="font-bold text-blue-600">0</span> kg</p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 mt-6">
+          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
+          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Özet ve Onay -->
+    <div id="step4" class="step-content hidden">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <i data-lucide="check-circle" class="w-6 h-6"></i>
+        Özet ve Onay
+      </h2>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <div class="space-y-4">
+          <div class="border-b pb-4">
+            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              Müşteri Bilgileri
+            </h3>
+            <p><span class="font-medium">Ad Soyad:</span> <span id="summaryAdSoyad"></span></p>
+            <p><span class="font-medium">Telefon:</span> <span id="summaryCep"></span></p>
+            <p><span class="font-medium">Alma Tarihi:</span> <span id="summaryAlmaTarihi"></span></p>
+            <p><span class="font-medium">Teslim Tarihi:</span> <span id="summaryTeslimTarihi"></span></p>
+          </div>
+          
+          <div class="border-b pb-4">
+            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              Ürün Bilgileri
+            </h3>
+            <p><span class="font-medium">Toplam Ağırlık:</span> <span id="summaryToplamKg"></span> kg</p>
+            <p><span class="font-medium">Fiyat:</span> <span id="summaryFiyat"></span> ₺</p>
+            <p><span class="font-medium">Açıklama:</span> <span id="summaryUrunAciklama"></span></p>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              Seçilen İşlemler
+            </h3>
+            <ul id="summaryIslemler" class="space-y-1">
+              <!-- İşlemler buraya eklenecek -->
+            </ul>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 mt-6">
+          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
+          <button type="button" id="completeButton" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2" onclick="completeMalKabul()">
+            <span id="completeButtonText">Tamamla</span>
+            <div id="completeButtonLoader" class="hidden">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Müşteriler Yönetimi -->
+  <div id="musteriler" class="hidden mt-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i data-lucide="users" class="w-6 h-6"></i>
+        Müşteri Yönetimi
+      </h2>
+      <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors flex items-center gap-2" onclick="showMusteriForm()">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        Yeni Müşteri
+      </button>
+    </div>
+
+    <!-- Arama ve Filtreleme -->
+    <div class="bg-white p-4 rounded-lg shadow mb-4">
+      <div class="flex gap-2 mb-3">
+        <div class="flex-1 relative">
+          <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+          <input type="text" id="musteriArama" class="w-full pl-10 pr-4 py-2 rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Müşteri ara..." onkeyup="filterMusteriler()">
+        </div>
+        <div class="relative">
+          <i data-lucide="filter" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+          <select id="musteriFiltre" class="pl-10 pr-8 py-2 rounded border-gray-300 focus:ring-2 focus:ring-blue-500" onchange="filterMusteriler()">
+            <option value="">Tümü</option>
+            <option value="aktif">Aktif</option>
+            <option value="pasif">Pasif</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Müşteri Listesi -->
+    <div id="musteriListesi" class="space-y-2">
+      <!-- Müşteriler buraya dinamik olarak eklenecek -->
+    </div>
+
+    <!-- Müşteri Ekleme/Düzenleme Formu -->
+    <div id="musteriForm" class="hidden mt-6 bg-white p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" id="formBaslik">
+        <i data-lucide="user-plus" class="w-5 h-5"></i>
+        Yeni Müşteri Ekle
+      </h3>
+      <form id="musteriFormElement" class="space-y-3">
+        <input type="hidden" id="musteriId">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input type="text" id="musteriAd" class="rounded border-gray-300" placeholder="Ad Soyad" required>
+          <input type="tel" id="musteriTelefon" class="rounded border-gray-300" placeholder="Telefon" required>
+          <input type="text" id="musteriAdres" class="rounded border-gray-300" placeholder="Adres">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <select id="musteriDurum" class="rounded border-gray-300">
+            <option value="aktif">Aktif</option>
+            <option value="pasif">Pasif</option>
+          </select>
+          <input type="text" id="musteriNot" class="rounded border-gray-300" placeholder="Notlar">
+        </div>
+        <div class="flex gap-2">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            Kaydet
+          </button>
+          <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors flex items-center gap-2" onclick="hideMusteriForm()">
+            <i data-lucide="x" class="w-4 h-4"></i>
+            İptal
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <button class="mt-6 w-full bg-gray-700 text-white p-2 rounded" onclick="goTo('mainMenu')">Ana Menü</button>
+  </div>
+
+  <!-- Bekleyen İşler -->
+  <div id="bekleyenIsler" class="hidden mt-6">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <i data-lucide="clock" class="w-6 h-6"></i>
+      Bekleyen İşler
+    </h2>
+    
+    <div class="bg-white p-4 rounded-lg shadow mb-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-semibold flex items-center gap-2">
+          <i data-lucide="package" class="w-5 h-5"></i>
+          Mal Kabul İşleri
+        </h3>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors flex items-center gap-2" onclick="loadBekleyenIsler()">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          Yenile
+        </button>
+      </div>
+      <div id="bekleyenIslerListesi" class="space-y-2">
+        <!-- Bekleyen işler buraya yüklenecek -->
+      </div>
+    </div>
+
+    <button class="mt-6 w-full bg-gray-700 text-white p-2 rounded" onclick="goTo('mainMenu')">Ana Menü</button>
+  </div>
+
+  <script>
+    // Google Apps Script URL - Bu URL'yi kendi Google Apps Script'inizle değiştirin
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxd_21EeF2NCaxfmBMG_J0OzS1lPeH4R7JiBwVkHHN9zUXDRHAnnCLi4rz4iWuGBiK4/exec";
+    
+    let toplamKg = 0;
+    let kalanKg = 0;
+    let musteriler = []; // Google Sheets'ten yüklenecek
+    let editingMusteriId = null;
+    let currentStepNumber = 1;
+    let selectedIslemler = [];
+
+    // Route handling
+    function initRouting() {
+      // Handle browser back/forward buttons
+      window.addEventListener('popstate', function(event) {
+        showScreen(event.state ? event.state.screen : 'mainMenu');
+      });
+
+      // Show initial screen based on URL
+      const path = window.location.pathname;
+      if (path === '/' || path === '/index.html') {
+        showScreen('mainMenu');
+      } else if (path === '/mal-kabul') {
+        showScreen('malKabulForm');
+      } else if (path === '/is-turu') {
+        showScreen('isTuruEkrani');
+      } else if (path === '/musteriler') {
+        showScreen('musteriler');
+      } else if (path === '/bekleyen-isler') {
+        showScreen('bekleyenIsler');
+      } else {
+        showScreen('mainMenu');
+      }
+    }
+
+    function goTo(screenId) {
+      // Update URL based on screen
+      let newPath = '/';
+      if (screenId === 'malKabulForm') {
+        newPath = '/mal-kabul';
+      } else if (screenId === 'musteriler') {
+        newPath = '/musteriler';
+      } else if (screenId === 'bekleyenIsler') {
+        newPath = '/bekleyen-isler';
+      }
+
+      // Update browser history
+      history.pushState({ screen: screenId }, '', newPath);
+      
+      showScreen(screenId);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll("body > div").forEach(div => div.classList.add("hidden"));
+      document.getElementById(screenId).classList.remove("hidden");
+
+      if (screenId === 'malKabulForm') {
+        // Mal kabul formu açıldığında ilk adıma git
+        currentStepNumber = 1;
+        showStep(1);
+        // Müşteri verilerini yükle
+        loadAllCustomers();
+      } else if (screenId === 'musteriler') {
+        loadMusteriler();
+      } else if (screenId === 'bekleyenIsler') {
+        loadBekleyenIsler();
+      }
+    }
+
+    // Adım Adım Süreç Fonksiyonları
+    function showStep(stepNumber) {
+      // Tüm adımları gizle
+      document.querySelectorAll('.step-content').forEach(step => {
+        step.classList.add('hidden');
+      });
+      
+      // Seçilen adımı göster
+      document.getElementById(`step${stepNumber}`).classList.remove('hidden');
+      
+      // Progress bar'ı güncelle
+      const progress = (stepNumber / 4) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('currentStep').textContent = stepNumber;
+      
+      // Adım başlığını güncelle
+      const stepTitles = {
+        1: 'Müşteri Bilgileri',
+        2: 'Ürün Detayları', 
+        3: 'İşlem Seçimi',
+        4: 'Özet ve Onay'
+      };
+      document.getElementById('stepTitle').textContent = stepTitles[stepNumber];
+      
+      currentStepNumber = stepNumber;
+      
+      // Adım 3'e geçerken kg bilgisini güncelle
+      if (stepNumber === 3) {
+        toplamKg = parseFloat(document.getElementById('toplamKg').value) || 0;
+        kalanKg = toplamKg;
+        document.getElementById('kgBilgi').textContent = toplamKg;
+        document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
+        updateIslemListesi();
+      }
+      
+      // Adım 4'e geçerken özeti güncelle
+      if (stepNumber === 4) {
+        updateSummary();
+      }
+    }
+
+    function nextStep() {
+      if (validateCurrentStep()) {
+        if (currentStepNumber < 4) {
+          showStep(currentStepNumber + 1);
+        }
+      }
+    }
+
+    function prevStep() {
+      if (currentStepNumber > 1) {
+        showStep(currentStepNumber - 1);
+      }
+    }
+
+    function validateCurrentStep() {
+      if (currentStepNumber === 1) {
+        const adsoyad = document.getElementById('adsoyad').value;
+        const cep = document.getElementById('cep').value;
+        const almaTarihi = document.getElementById('almaTarihi').value;
+        const teslimTarihi = document.getElementById('teslimTarihi').value;
+        
+        if (!adsoyad || !cep || !almaTarihi || !teslimTarihi) {
+          alert('Lütfen tüm zorunlu alanları doldurun.');
+          return false;
+        }
+      } else if (currentStepNumber === 2) {
+        const toplamKg = document.getElementById('toplamKg').value;
+        const fiyat = document.getElementById('fiyat').value;
+        
+        if (!toplamKg || !fiyat) {
+          alert('Lütfen toplam ağırlık ve fiyat bilgilerini girin.');
+          return false;
+        }
+      } else if (currentStepNumber === 3) {
+        if (selectedIslemler.length === 0) {
+          alert('Lütfen en az bir işlem türü seçin.');
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function ekleIslem(tip) {
+      if (kalanKg <= 0) {
+        alert("Tüm miktar dağıtıldı.");
+        return;
+      }
+
+      const miktarStr = prompt(tip + ' için kaç kg? (Kalan: ' + kalanKg + ' kg)');
+      const miktar = parseFloat(miktarStr);
+      if (!miktar || isNaN(miktar) || miktar <= 0) return;
+      if (miktar > kalanKg) {
+        alert("Bu kadar kg kalmadı.");
+        return;
+      }
+
+      kalanKg -= miktar;
+      document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
+
+      // İşlemi listeye ekle
+      selectedIslemler.push({ tip: tip, miktar: miktar });
+      updateIslemListesi();
+    }
+
+    function updateIslemListesi() {
+      const islemListesi = document.getElementById('islemListesi');
+      islemListesi.innerHTML = '';
+
+      if (selectedIslemler.length === 0) {
+        islemListesi.innerHTML = '<li class="text-gray-500 text-sm">Henüz işlem seçilmedi</li>';
+        return;
+      }
+
+      selectedIslemler.forEach((islem, index) => {
+        const li = document.createElement('li');
+        li.className = "bg-white shadow p-3 rounded flex justify-between items-center";
+        li.innerHTML = `
+          <span>${islem.tip}: ${islem.miktar} kg</span>
+          <button onclick="removeIslem(${index})" class="text-red-600 hover:text-red-800 text-sm">Sil</button>
+        `;
+        islemListesi.appendChild(li);
+      });
+    }
+
+    function removeIslem(index) {
+      const islem = selectedIslemler[index];
+      kalanKg += islem.miktar;
+      document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
+      selectedIslemler.splice(index, 1);
+      updateIslemListesi();
+    }
+
+    function updateSummary() {
+      document.getElementById('summaryAdSoyad').textContent = document.getElementById('adsoyad').value;
+      document.getElementById('summaryCep').textContent = document.getElementById('cep').value;
+      document.getElementById('summaryAlmaTarihi').textContent = document.getElementById('almaTarihi').value;
+      document.getElementById('summaryTeslimTarihi').textContent = document.getElementById('teslimTarihi').value;
+      document.getElementById('summaryToplamKg').textContent = document.getElementById('toplamKg').value;
+      document.getElementById('summaryFiyat').textContent = document.getElementById('fiyat').value;
+      document.getElementById('summaryUrunAciklama').textContent = document.getElementById('urunAciklama').value || 'Açıklama yok';
+
+      const summaryIslemler = document.getElementById('summaryIslemler');
+      summaryIslemler.innerHTML = '';
+      
+      if (selectedIslemler.length === 0) {
+        summaryIslemler.innerHTML = '<li class="text-gray-500">İşlem seçilmedi</li>';
+      } else {
+        selectedIslemler.forEach(islem => {
+      const li = document.createElement('li');
+          li.textContent = `${islem.tip}: ${islem.miktar} kg`;
+          summaryIslemler.appendChild(li);
+        });
+      }
+    }
+
+    async function completeMalKabul() {
+      // Butonu pasif yap ve loader göster
+      const completeButton = document.getElementById('completeButton');
+      const buttonText = document.getElementById('completeButtonText');
+      const buttonLoader = document.getElementById('completeButtonLoader');
+      
+      completeButton.disabled = true;
+      completeButton.classList.add('opacity-50', 'cursor-not-allowed');
+      buttonText.textContent = 'Kaydediliyor...';
+      buttonLoader.classList.remove('hidden');
+      
+      try {
+        // Mal kabul verilerini Google Sheets'e kaydet
+        await saveMalKabulToSheets();
+        
+        // Formu sıfırla
+        document.getElementById('adsoyad').value = '';
+        document.getElementById('cep').value = '';
+        document.getElementById('almaTarihi').value = '';
+        document.getElementById('teslimTarihi').value = '';
+        document.getElementById('toplamKg').value = '';
+        document.getElementById('fiyat').value = '';
+        document.getElementById('urunAciklama').value = '';
+        selectedIslemler = [];
+        currentStepNumber = 1;
+        
+        // Ana menüye dön
+        goTo('mainMenu');
+      } catch (error) {
+        alert('Kayıt sırasında hata oluştu: ' + error.message);
+      } finally {
+        // Butonu tekrar aktif yap
+        completeButton.disabled = false;
+        completeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        buttonText.textContent = 'Tamamla';
+        buttonLoader.classList.add('hidden');
+      }
+    }
+
+    // Müşteri Yönetimi Fonksiyonları
+    async function loadMusteriler() {
+      const musteriListesi = document.getElementById('musteriListesi');
+      musteriListesi.innerHTML = '<div class="text-center text-gray-500 py-8">Müşteriler yükleniyor...</div>';
+
+      try {
+        // Google Sheets'ten müşteri verilerini çek
+        const res = await fetch(SCRIPT_URL + '?type=musteriler');
+        const data = await res.json();
+        
+        console.log('Müşteri verisi:', data); // Debug için
+        
+        musteriListesi.innerHTML = '';
+
+        if (!data || data.length === 0) {
+          musteriListesi.innerHTML = '<div class="text-center text-gray-500 py-8">Henüz müşteri eklenmemiş</div>';
+          return;
+        }
+
+        // Başlık satırı var mı kontrol et
+        let dataToShow = data;
+        if (data[0] && data[0][0] === 'ID') {
+          // Başlık satırı varsa atla
+          dataToShow = data.slice(1);
+        }
+
+        if (dataToShow.length === 0) {
+          musteriListesi.innerHTML = '<div class="text-center text-gray-500 py-8">Henüz müşteri eklenmemiş</div>';
+          return;
+        }
+
+        dataToShow.forEach((row, index) => {
+          const musteriDiv = document.createElement('div');
+          musteriDiv.className = `bg-white p-4 rounded-lg shadow flex justify-between items-center ${row[4] === 'pasif' ? 'opacity-60' : ''}`;
+          musteriDiv.innerHTML = `
+            <div class="flex-1">
+              <h3 class="font-semibold">${row[1] || 'İsimsiz'}</h3>
+              <p class="text-sm text-gray-600">${row[2] || 'Telefon yok'}</p>
+              ${row[3] ? `<p class="text-sm text-gray-500">Adres: ${row[3]}</p>` : ''}
+              <span class="inline-block px-2 py-1 text-xs rounded ${row[4] === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${row[4] || 'aktif'}</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="editMusteriFromSheets('${row[0]}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors flex items-center gap-1">
+                <i data-lucide="edit" class="w-3 h-3"></i>
+                Düzenle
+              </button>
+              <button onclick="deleteMusteriFromSheets('${row[0]}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                Sil
+              </button>
+            </div>
+          `;
+          musteriListesi.appendChild(musteriDiv);
+        });
+        
+        // Re-initialize icons for dynamically added content
+        lucide.createIcons();
+      } catch (error) {
+        musteriListesi.innerHTML = '<div class="text-center text-red-500 py-8">Hata: ' + error.message + '</div>';
+      }
+    }
+
+    function showMusteriForm() {
+      document.getElementById('musteriForm').classList.remove('hidden');
+      document.getElementById('formBaslik').textContent = 'Yeni Müşteri Ekle';
+      document.getElementById('musteriFormElement').reset();
+      editingMusteriId = null;
+    }
+
+    function hideMusteriForm() {
+      document.getElementById('musteriForm').classList.add('hidden');
+      editingMusteriId = null;
+    }
+
+    async function editMusteriFromSheets(id) {
+      try {
+        // Google Sheets'ten müşteri verilerini çek
+        const res = await fetch(SCRIPT_URL + '?type=musteriler');
+        const data = await res.json();
+        
+        // Başlık satırı var mı kontrol et
+        let dataToSearch = data;
+        if (data[0] && data[0][0] === 'ID') {
+          // Başlık satırı varsa atla
+          dataToSearch = data.slice(1);
+        }
+        
+        // ID'ye göre müşteriyi bul
+        const musteri = dataToSearch.find(row => row[0] == id);
+        
+        if (musteri) {
+          // Formu doldur - veri sırası: ID, Ad, Telefon, Adres, Durum, Not, Tarih
+          document.getElementById('musteriAd').value = musteri[1] || '';
+          document.getElementById('musteriTelefon').value = musteri[2] || '';
+          document.getElementById('musteriAdres').value = musteri[3] || '';
+          document.getElementById('musteriDurum').value = musteri[4] || 'aktif';
+          document.getElementById('musteriNot').value = musteri[5] || '';
+          
+          // Düzenleme moduna geç
+          editingMusteriId = id;
+          document.getElementById('formBaslik').innerHTML = `
+            <i data-lucide="edit" class="w-5 h-5"></i>
+            Müşteri Düzenle
+          `;
+          document.getElementById('musteriForm').classList.remove('hidden');
+          
+          // İkonları yenile
+          lucide.createIcons();
+        } else {
+          alert('Müşteri bulunamadı');
+        }
+      } catch (error) {
+        alert('Müşteri verisi yüklenirken hata oluştu: ' + error.message);
+      }
+    }
+
+    async function deleteMusteriFromSheets(id) {
+      if (confirm('Bu müşteriyi silmek istediğinizden emin misiniz?')) {
+        try {
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              type: 'deleteMusteri',
+              id: id
+            })
+          });
+          
+          if (res.ok) {
+            alert('Müşteri silindi!');
+            loadMusteriler();
+          } else {
+            alert('Silme işlemi başarısız.');
+          }
+        } catch (error) {
+          alert('Hata oluştu: ' + error.message);
+        }
+      }
+    }
+
+
+    function filterMusteriler() {
+      const arama = document.getElementById('musteriArama').value.toLowerCase();
+      const filtre = document.getElementById('musteriFiltre').value;
+      
+      const musteriListesi = document.getElementById('musteriListesi');
+      const musteriDivs = musteriListesi.querySelectorAll('div');
+      
+      musteriDivs.forEach(div => {
+        const musteri = musteriler.find(m => div.innerHTML.includes(m.ad));
+        if (!musteri) return;
+        
+        const aramaMatch = !arama || musteri.ad.toLowerCase().includes(arama) || 
+                          musteri.telefon.includes(arama) || 
+                          (musteri.email && musteri.email.toLowerCase().includes(arama));
+        const filtreMatch = !filtre || musteri.durum === filtre;
+        
+        div.style.display = (aramaMatch && filtreMatch) ? 'flex' : 'none';
+      });
+    }
+
+    // Form submit handler
+    document.getElementById('musteriFormElement').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        ad: document.getElementById('musteriAd').value,
+        telefon: document.getElementById('musteriTelefon').value,
+        adres: document.getElementById('musteriAdres').value,
+        durum: document.getElementById('musteriDurum').value,
+        not: document.getElementById('musteriNot').value,
+        tarih: new Date().toLocaleDateString('tr-TR')
+      };
+
+      if (editingMusteriId !== null) {
+        // Düzenleme modu - ID'yi ekle
+        formData.id = editingMusteriId;
+        await updateMusteriInSheets(formData);
+      } else {
+        // Yeni müşteri ekleme
+        await saveMusteriToSheets(formData);
+      }
+      
+      // Formu temizle ve kapat
+      hideMusteriForm();
+    });
+
+    // Müşteri arama fonksiyonu
+    let allCustomers = []; // Tüm müşteri verilerini cache'leyeceğiz
+    
+    async function loadAllCustomers() {
+      try {
+        const res = await fetch(SCRIPT_URL + '?type=musteriler');
+        const data = await res.json();
+        
+        // Başlık satırı var mı kontrol et
+        if (data[0] && data[0][0] === 'ID') {
+          allCustomers = data.slice(1);
+        } else {
+          allCustomers = data;
+        }
+      } catch (error) {
+        console.log('Müşteri verileri yüklenemedi:', error);
+        allCustomers = [];
+      }
+    }
+    
+    // Türkçe karakterleri normalize et
+    function normalizeText(text) {
+      return text.toLowerCase()
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ı/g, 'i')
+        .replace(/i̇/g, 'i')  // Noktalı i'yi noktasız i'ye çevir
+        .replace(/İ/g, 'i')  // Büyük İ'yi i'ye çevir
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c')
+        .trim();
+    }
+
+    function searchCustomers(query) {
+      if (!query || query.length < 2) return [];
+      
+      const searchTerm = normalizeText(query);
+      return allCustomers.filter(customer => {
+        const name = normalizeText((customer[1] || '').toString());
+        const phone = (customer[2] || '').toString().toLowerCase();
+        
+        // İsim veya telefon numarasında arama yap
+        return name.includes(searchTerm) || phone.includes(searchTerm);
+      }).slice(0, 5); // En fazla 5 sonuç göster
+    }
+    
+    function showCustomerSuggestions(customers) {
+      const suggestionsDiv = document.getElementById('customerSuggestions');
+      
+      if (customers.length === 0) {
+        suggestionsDiv.classList.add('hidden');
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = '';
+      customers.forEach(customer => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0';
+        suggestionItem.innerHTML = `
+          <div class="font-medium">${customer[1] || 'İsimsiz'}</div>
+          <div class="text-sm text-gray-500">${customer[2] || 'Telefon yok'}</div>
+        `;
+        
+        suggestionItem.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          
+          // Input değerini değiştir
+          const adsoyadInput = document.getElementById('adsoyad');
+          const cepInput = document.getElementById('cep');
+          
+          adsoyadInput.value = customer[1] || '';
+          cepInput.value = customer[2] || '';
+          
+          // Dropdown'u gizle
+          suggestionsDiv.classList.add('hidden');
+          
+          // Input'a focus ver
+          adsoyadInput.focus();
+        });
+        
+        suggestionsDiv.appendChild(suggestionItem);
+      });
+      
+      suggestionsDiv.classList.remove('hidden');
+    }
+
+    // Google Sheets Fonksiyonları
+    // Müşteri bilgilerini müşteriler sayfasına kaydet/güncelle ve ID'sini döndür
+    async function saveOrUpdateCustomerFromMalKabul(adSoyad, telefon) {
+      if (!adSoyad || !telefon) return null;
+
+      try {
+        // Önce mevcut müşterileri kontrol et
+        const res = await fetch(SCRIPT_URL + '?type=musteriler');
+        const data = await res.json();
+        
+        // Başlık satırı var mı kontrol et
+        let dataToSearch = data;
+        if (data[0] && data[0][0] === 'ID') {
+          dataToSearch = data.slice(1);
+        }
+        
+        // Aynı telefon numarasına sahip müşteri var mı?
+        const existingCustomer = dataToSearch.find(row => {
+          const customerPhone = row[2]?.toString();
+          const searchPhone = telefon?.toString();
+          return customerPhone === searchPhone;
+        });
+        
+        if (existingCustomer) {
+          // Mevcut müşteriyi güncelle
+          const updateData = {
+            type: 'updateMusteri',
+            id: existingCustomer[0],
+            ad: adSoyad,
+            telefon: telefon,
+            adres: existingCustomer[3] || '',
+            durum: 'aktif',
+            not: existingCustomer[5] || '',
+            tarih: new Date().toLocaleDateString('tr-TR')
+          };
+          
+          await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(updateData)
+          });
+          
+          // Mevcut müşterinin ID'sini döndür
+          return existingCustomer[0];
+        } else {
+          // Yeni müşteri ekle
+          const newCustomerData = {
+            type: 'musteri',
+            ad: adSoyad,
+            telefon: telefon,
+            adres: '',
+            durum: 'aktif',
+            not: 'Mal kabul işleminden eklendi',
+            tarih: new Date().toLocaleDateString('tr-TR')
+          };
+          
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(newCustomerData)
+          });
+          
+          // Google Apps Script'ten ID dönmüyorsa, müşteri listesini tekrar çek ve son eklenen müşteriyi bul
+          const refreshRes = await fetch(SCRIPT_URL + '?type=musteriler');
+          const refreshData = await refreshRes.json();
+          
+          let refreshToSearch = refreshData;
+          if (refreshData[0] && refreshData[0][0] === 'ID') {
+            refreshToSearch = refreshData.slice(1);
+          }
+          
+          // Telefon numarasına göre yeni eklenen müşteriyi bul
+          const newCustomer = refreshToSearch.find(row => {
+            const customerPhone = row[2]?.toString();
+            const searchPhone = telefon?.toString();
+            return customerPhone === searchPhone;
+          });
+          
+          return newCustomer ? newCustomer[0] : null;
+        }
+      } catch (error) {
+        console.log('Müşteri senkronizasyon hatası:', error);
+        return null;
+      }
+    }
+
+    async function saveMalKabulToSheets() {
+      const adsoyad = document.getElementById('adsoyad').value;
+      const cep = document.getElementById('cep').value;
+      const almaTarihi = document.getElementById('almaTarihi').value;
+      const teslimTarihi = document.getElementById('teslimTarihi').value;
+      const fiyat = document.getElementById('fiyat').value;
+      const toplamKg = document.getElementById('toplamKg').value;
+      const urunAciklama = document.getElementById('urunAciklama').value;
+
+      if (!adsoyad || !cep || !almaTarihi || !teslimTarihi || !fiyat || !toplamKg) {
+        console.log('Mal kabul formu eksik bilgiler nedeniyle kaydedilemedi.');
+        return;
+      }
+
+      // Önce müşteri bilgilerini müşteriler sayfasına kaydet/güncelle ve ID'sini al
+      const musteriId = await saveOrUpdateCustomerFromMalKabul(adsoyad, cep);
+      
+      
+      if (!musteriId) {
+        alert('Müşteri kaydı oluşturulamadı!');
+        return;
+      }
+
+      // Seçilen işlemleri string olarak birleştir
+      const islemlerStr = selectedIslemler.map(islem => `${islem.tip}: ${islem.miktar}kg`).join(', ');
+
+      const data = {
+        type: 'malKabul',
+        musteriId: musteriId.toString(), // String olarak gönder
+        almaTarihi: almaTarihi,
+        teslimTarihi: teslimTarihi,
+        toplamKg: toplamKg,
+        fiyat: fiyat,
+        islemler: islemlerStr,
+        durum: 'Beklemede',
+        urunAciklama: urunAciklama || ''
+      };
+      
+      
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          alert('Mal kabul verisi Google Sheets\'e kaydedildi!');
+        } else {
+          alert('Mal kabul kayıt başarısız. Lütfen tekrar deneyin.');
+        }
+      } catch (error) {
+        alert('Hata oluştu: ' + error.message);
+      }
+    }
+
+    async function saveMusteriToSheets(formData) {
+      const data = {
+        type: 'musteri', // Müşteri verisi olduğunu belirt
+        ad: formData.ad,
+        telefon: formData.telefon,
+        adres: formData.adres || '',
+        durum: formData.durum,
+        not: formData.not || '',
+        tarih: formData.tarih
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert('Müşteri bilgisi Google Sheets\'e kaydedildi!');
+          // Müşteri listesini yenile
+          loadMusteriler();
+        } else {
+          alert('Müşteri kayıt başarısız. Lütfen tekrar deneyin.');
+        }
+      } catch (error) {
+        alert('Hata oluştu: ' + error.message);
+      }
+    }
+
+    async function updateMusteriInSheets(formData) {
+      const data = {
+        type: 'updateMusteri',
+        id: formData.id,
+        ad: formData.ad,
+        telefon: formData.telefon,
+        adres: formData.adres || '',
+        durum: formData.durum,
+        not: formData.not || '',
+        tarih: formData.tarih
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert('Müşteri bilgisi güncellendi!');
+          // Müşteri listesini yenile
+          loadMusteriler();
+        } else {
+          alert('Müşteri güncelleme başarısız. Lütfen tekrar deneyin.');
+        }
+      } catch (error) {
+        alert('Hata oluştu: ' + error.message);
+      }
+    }
+
+
+    async function loadBekleyenIsler() {
+      try {
+        // Mal kabul verilerini ve müşteri verilerini paralel olarak çek
+        const [malKabulRes, musteriRes] = await Promise.all([
+          fetch(SCRIPT_URL + '?type=malKabul'),
+          fetch(SCRIPT_URL + '?type=musteriler')
+        ]);
+        
+        const malKabulData = await malKabulRes.json();
+        const musteriData = await musteriRes.json();
+        
+        const bekleyenIslerListesi = document.getElementById('bekleyenIslerListesi');
+        bekleyenIslerListesi.innerHTML = '';
+
+        // Başlık satırlarını kontrol et
+        let malKabulToShow = malKabulData;
+        if (malKabulData[0] && malKabulData[0][0] === 'ID') {
+          malKabulToShow = malKabulData.slice(1);
+        }
+        
+        let musteriToSearch = musteriData;
+        if (musteriData[0] && musteriData[0][0] === 'ID') {
+          musteriToSearch = musteriData.slice(1);
+        }
+
+        if (malKabulToShow.length === 0) {
+          bekleyenIslerListesi.innerHTML = '<div class="text-center text-gray-500 py-8">Bekleyen iş bulunamadı</div>';
+          return;
+        }
+
+        malKabulToShow.forEach((row, index) => {
+          // Müşteri ID'sinden müşteri bilgilerini bul
+          const musteriId = row[1]; // Müşteri ID'si 2. sütunda
+          
+          let musteriAdi = 'Müşteri bulunamadı';
+          let musteriTelefon = 'Telefon yok';
+          
+          // Eğer müşteri ID'si boş değilse ara
+          if (musteriId && musteriId !== '') {
+            const musteri = musteriToSearch.find(m => m[0] == musteriId);
+            if (musteri) {
+              musteriAdi = musteri[1];
+              musteriTelefon = musteri[2];
+            }
+          } else {
+            // Eski kayıtlar için - eğer müşteri ID'si boş ise, eski yapıdan bilgileri al
+            // Bu geçici bir çözüm, eski kayıtlar için
+            musteriAdi = row[1] || 'Eski kayıt - ID yok';
+            musteriTelefon = row[2] || 'Telefon yok';
+          }
+          
+          const isDiv = document.createElement('div');
+          isDiv.className = 'bg-white p-4 rounded-lg shadow border-l-4 border-blue-500';
+          isDiv.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h4 class="font-semibold text-lg">${musteriAdi}</h4>
+                <p class="text-gray-600 flex items-center gap-1">
+                  <i data-lucide="phone" class="w-4 h-4"></i>
+                  ${musteriTelefon}
+                </p>
+                <p class="text-sm text-gray-500 flex items-center gap-1">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                  Alma: ${row[2] ? new Date(row[2]).toLocaleDateString('tr-TR') : 'Tarih yok'} | Teslim: ${row[3] ? new Date(row[3]).toLocaleDateString('tr-TR') : 'Tarih yok'}
+                </p>
+                <p class="text-sm text-gray-500 flex items-center gap-1">
+                  <i data-lucide="scale" class="w-4 h-4"></i>
+                  ${row[4] || '0'} kg | 
+                  <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                  ${row[5] || '0'} ₺
+                </p>
+                <p class="text-sm text-gray-500 flex items-center gap-1">
+                  <i data-lucide="settings" class="w-4 h-4"></i>
+                  ${row[6] || 'İşlem yok'}
+                </p>
+                <span class="inline-block px-2 py-1 text-xs rounded ${row[7] === 'Tamamlandı' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${row[7] || 'Beklemede'}</span>
+              </div>
+              <div class="flex gap-2 ml-4">
+                <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors flex items-center gap-1" onclick="tamamlaIs('${row[0]}')">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  Tamamla
+                </button>
+                <button class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors flex items-center gap-1" onclick="silIs('${row[0]}')">
+                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                  Sil
+                </button>
+              </div>
+            </div>
+          `;
+          bekleyenIslerListesi.appendChild(isDiv);
+        });
+        // Re-initialize icons for dynamically added content
+        lucide.createIcons();
+      } catch (error) {
+        document.getElementById('bekleyenIslerListesi').innerHTML = '<div class="text-center text-red-500 py-8">Hata: ' + error.message + '</div>';
+      }
+    }
+
+    function bitirMalKabul() {
+      // Mal kabul verilerini Google Sheets'e kaydet
+      saveMalKabulToSheets();
+      // Ana menüye dön
+      goTo('mainMenu');
+    }
+
+    async function tamamlaIs(index) {
+      // Bu fonksiyon işi tamamlandı olarak işaretler
+      alert('İş tamamlandı olarak işaretlendi!');
+      loadBekleyenIsler(); // Listeyi yenile
+    }
+
+    async function silIs(index) {
+      if (confirm('Bu işi silmek istediğinizden emin misiniz?')) {
+        alert('İş silindi!');
+        loadBekleyenIsler(); // Listeyi yenile
+      }
+    }
+
+    // Initialize routing when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initRouting();
+      // Initialize Lucide icons
+      lucide.createIcons();
+      
+      // Müşteri arama input event listener
+      const adsoyadInput = document.getElementById('adsoyad');
+      if (adsoyadInput) {
+        let searchTimeout;
+        
+        adsoyadInput.addEventListener('input', async function(e) {
+          const query = e.target.value;
+          
+          // Önceki timeout'u temizle
+          clearTimeout(searchTimeout);
+          
+          if (query.length >= 2) {
+            // 300ms bekle, kullanıcı yazmayı bitirsin
+            searchTimeout = setTimeout(async () => {
+              // Eğer müşteri verileri henüz yüklenmediyse bekle
+              if (allCustomers.length === 0) {
+                await loadAllCustomers();
+              }
+              const results = searchCustomers(query);
+              showCustomerSuggestions(results);
+            }, 300);
+          } else {
+            document.getElementById('customerSuggestions').classList.add('hidden');
+          }
+        });
+        
+        // Input dışına tıklandığında önerileri gizle
+        adsoyadInput.addEventListener('blur', function(e) {
+          // Eğer blur, dropdown içindeki bir öğeye tıklamaktan kaynaklanıyorsa gizleme
+          setTimeout(() => {
+            const suggestionsDiv = document.getElementById('customerSuggestions');
+            if (!suggestionsDiv.matches(':hover')) {
+              suggestionsDiv.classList.add('hidden');
+            }
+          }, 150);
+        });
+        
+        // Dropdown dışına tıklandığında gizle
+        document.addEventListener('click', function(e) {
+          const suggestionsDiv = document.getElementById('customerSuggestions');
+          const adsoyadInput = document.getElementById('adsoyad');
+          
+          if (!suggestionsDiv.contains(e.target) && e.target !== adsoyadInput) {
+            suggestionsDiv.classList.add('hidden');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
