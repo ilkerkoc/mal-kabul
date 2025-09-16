@@ -8,11 +8,45 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <style>
     .hidden { display: none !important; }
+    
+    /* Mobile-specific improvements */
+    @media (max-width: 768px) {
+      body {
+        padding: 0.75rem;
+      }
+      
+      /* Better touch targets */
+      button, select, input[type="date"], input[type="tel"], input[type="text"], textarea {
+        min-height: 44px;
+      }
+      
+      /* Improved card spacing on mobile */
+      .card-spacing {
+        margin-bottom: 1rem;
+      }
+      
+      /* Better text sizing for mobile */
+      .mobile-text-base {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+    }
+    
+    /* Smooth transitions for card expansion */
+    .transition-transform {
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    /* Improved focus states for accessibility */
+    button:focus, select:focus, input:focus, textarea:focus {
+      outline: 2px solid #3B82F6;
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body class="bg-gray-100 p-4 min-h-screen">
   <div id="mainMenu">
-    <div class="grid grid-cols-2 gap-4 text-center">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
       <button class="bg-blue-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-blue-700 transition-colors" onclick="goTo('malKabulForm')">
         <i data-lucide="package" class="w-8 h-8 mx-auto mb-2"></i><br>Mal Kabul
       </button>
@@ -22,8 +56,8 @@
       <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors" onclick="goTo('musteriler')">
         <i data-lucide="users" class="w-8 h-8 mx-auto mb-2"></i><br>Müşteriler
       </button>
-      <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors">
-        <i data-lucide="bar-chart-3" class="w-8 h-8 mx-auto mb-2"></i><br>Raporlar
+      <button class="bg-gray-600 text-white rounded-xl p-6 text-lg font-semibold shadow hover:bg-gray-700 transition-colors" onclick="goTo('calendar')">
+        <i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2"></i><br>Takvim
       </button>
     </div>
     
@@ -311,8 +345,110 @@
           Yenile
         </button>
       </div>
-      <div id="bekleyenIslerListesi" class="space-y-2">
+      <div id="bekleyenIslerListesi" class="space-y-3 md:space-y-4">
         <!-- Bekleyen işler buraya yüklenecek -->
+      </div>
+    </div>
+
+    <button class="mt-6 w-full bg-gray-700 text-white p-2 rounded" onclick="goTo('mainMenu')">Ana Menü</button>
+  </div>
+
+  <!-- Calendar Page -->
+  <div id="calendar" class="hidden mt-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold flex items-center gap-2">
+        <i data-lucide="calendar" class="w-6 h-6"></i>
+        İş Takvimi
+      </h2>
+      <div class="flex items-center gap-3">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors flex items-center gap-2" onclick="loadCalendarData()">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          Yenile
+        </button>
+        <select id="calendarView" class="px-3 py-2 rounded border-gray-300 focus:ring-2 focus:ring-blue-500" onchange="changeCalendarView()">
+          <option value="month">Aylık</option>
+          <option value="week">Haftalık</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Calendar Navigation -->
+    <div class="bg-white p-4 rounded-lg shadow mb-4">
+      <div class="flex justify-between items-center mb-4">
+        <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center gap-2" onclick="previousPeriod()">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          Önceki
+        </button>
+        <h3 id="currentPeriod" class="text-lg font-semibold text-center"></h3>
+        <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors flex items-center gap-2" onclick="nextPeriod()">
+          Sonraki
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+      
+      <!-- Legend -->
+      <div class="flex flex-wrap gap-4 text-sm">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-green-500 rounded"></div>
+          <span>Tamamlandı</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-blue-500 rounded"></div>
+          <span>İşleniyor</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-yellow-500 rounded"></div>
+          <span>Beklemede</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-gray-400 rounded"></div>
+          <span>Başlangıç Tarihi</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-red-500 rounded"></div>
+          <span>Teslim Tarihi</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div id="calendarContainer" class="p-4">
+        <!-- Calendar content will be generated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Day Jobs Modal -->
+    <div id="dayJobsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="dayJobsTitle" class="text-lg font-semibold"></h3>
+            <button onclick="closeDayJobsModal()" class="text-gray-500 hover:text-gray-700">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div id="dayJobsContent">
+            <!-- Day jobs content -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Details Modal -->
+    <div id="jobDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">İş Detayları</h3>
+            <button onclick="closeJobModal()" class="text-gray-500 hover:text-gray-700">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div id="jobModalContent">
+            <!-- Job details content -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -321,7 +457,7 @@
 
   <script>
     // Google Apps Script URL - Bu URL'yi kendi Google Apps Script'inizle değiştirin
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxd_21EeF2NCaxfmBMG_J0OzS1lPeH4R7JiBwVkHHN9zUXDRHAnnCLi4rz4iWuGBiK4/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfEUVwnTD0wApTxkpJhEQTv-uZoeC54C3Npt_pg_5c-mbAtmmMYng1CjrMsQc53KBD/exec";
     
     let toplamKg = 0;
     let kalanKg = 0;
@@ -363,6 +499,8 @@
         newPath = '/musteriler';
       } else if (screenId === 'bekleyenIsler') {
         newPath = '/bekleyen-isler';
+      } else if (screenId === 'calendar') {
+        newPath = '/takvim';
       }
 
       // Update browser history
@@ -385,6 +523,8 @@
         loadMusteriler();
       } else if (screenId === 'bekleyenIsler') {
         loadBekleyenIsler();
+      } else if (screenId === 'calendar') {
+        loadCalendarData();
       }
     }
 
@@ -593,7 +733,6 @@
         const res = await fetch(SCRIPT_URL + '?type=musteriler');
         const data = await res.json();
         
-        console.log('Müşteri verisi:', data); // Debug için
         
         musteriListesi.innerHTML = '';
 
@@ -616,23 +755,58 @@
 
         dataToShow.forEach((row, index) => {
           const musteriDiv = document.createElement('div');
-          musteriDiv.className = `bg-white p-4 rounded-lg shadow flex justify-between items-center ${row[4] === 'pasif' ? 'opacity-60' : ''}`;
+          musteriDiv.className = `bg-white rounded-lg shadow border-l-4 border-green-500 overflow-hidden ${row[4] === 'pasif' ? 'opacity-60 border-red-500' : ''}`;
           musteriDiv.innerHTML = `
-            <div class="flex-1">
-              <h3 class="font-semibold">${row[1] || 'İsimsiz'}</h3>
-              <p class="text-sm text-gray-600">${row[2] || 'Telefon yok'}</p>
-              ${row[3] ? `<p class="text-sm text-gray-500">Adres: ${row[3]}</p>` : ''}
-              <span class="inline-block px-2 py-1 text-xs rounded ${row[4] === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${row[4] || 'aktif'}</span>
+            <div class="p-4 cursor-pointer hover:bg-gray-50 transition-colors" onclick="toggleCustomerExpansion('${row[0]}')">
+              <div class="flex justify-between items-start">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 class="font-semibold text-lg text-gray-900 truncate">${row[1] || 'İsimsiz'}</h3>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0" id="customer-chevron-${row[0]}"></i>
             </div>
-            <div class="flex gap-2">
-              <button onclick="editMusteriFromSheets('${row[0]}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors flex items-center gap-1">
-                <i data-lucide="edit" class="w-3 h-3"></i>
+                  <div class="space-y-2">
+                    <p class="text-gray-600 flex items-center gap-2">
+                      <i data-lucide="phone" class="w-4 h-4 flex-shrink-0"></i>
+                      <span class="truncate">${row[2] || 'Telefon yok'}</span>
+                    </p>
+                    ${row[3] ? `
+                      <p class="text-sm text-gray-500 flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 flex-shrink-0"></i>
+                        <span class="truncate">${row[3]}</span>
+                      </p>
+                    ` : ''}
+                    <div class="mt-3">
+                      <span class="inline-block px-3 py-1 text-sm rounded-full font-medium ${row[4] === 'aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${row[4] || 'aktif'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Expanded Customer Content -->
+            <div id="customer-expanded-${row[0]}" class="hidden border-t border-gray-200 p-4 bg-gray-50">
+              <h5 class="font-semibold mb-4 flex items-center gap-2 text-base">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                Müşteri İşleri
+              </h5>
+              
+              <!-- Customer Jobs Loading -->
+              <div id="customer-jobs-${row[0]}" class="text-center py-4 text-gray-500">
+                <i data-lucide="loader" class="w-6 h-6 mx-auto mb-2 animate-spin"></i>
+                İşler yükleniyor...
+              </div>
+              
+              <!-- Customer Actions -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-300">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm" onclick="editMusteriFromSheets('${row[0]}')">
+                  <i data-lucide="edit" class="w-4 h-4"></i>
                 Düzenle
               </button>
-              <button onclick="deleteMusteriFromSheets('${row[0]}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors flex items-center gap-1">
-                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <button class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-sm" onclick="deleteMusteriFromSheets('${row[0]}')">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
                 Sil
               </button>
+              </div>
             </div>
           `;
           musteriListesi.appendChild(musteriDiv);
@@ -784,7 +958,6 @@
           allCustomers = data;
         }
       } catch (error) {
-        console.log('Müşteri verileri yüklenemedi:', error);
         allCustomers = [];
       }
     }
@@ -935,7 +1108,6 @@
           return newCustomer ? newCustomer[0] : null;
         }
       } catch (error) {
-        console.log('Müşteri senkronizasyon hatası:', error);
         return null;
       }
     }
@@ -950,7 +1122,6 @@
       const urunAciklama = document.getElementById('urunAciklama').value;
 
       if (!adsoyad || !cep || !almaTarihi || !teslimTarihi || !fiyat || !toplamKg) {
-        console.log('Mal kabul formu eksik bilgiler nedeniyle kaydedilemedi.');
         return;
       }
 
@@ -1109,39 +1280,73 @@
             musteriTelefon = row[2] || 'Telefon yok';
           }
           
+          // İşlem listesini parse et ve tablo için hazırla
+          const islemlerStr = row[6] || 'İşlem yok';
+          const processStatuses = row[9] ? JSON.parse(row[9]) : {}; // 10. sütun (İşlem Durumları)
+          const islemlerTable = parseIslemlerToTable(islemlerStr, row[0], processStatuses);
+          
           const isDiv = document.createElement('div');
-          isDiv.className = 'bg-white p-4 rounded-lg shadow border-l-4 border-blue-500';
+          isDiv.className = 'bg-white rounded-lg shadow border-l-4 border-blue-500 overflow-hidden card-spacing';
           isDiv.innerHTML = `
+            <div class="p-4 md:p-5 cursor-pointer hover:bg-gray-50 transition-colors" onclick="toggleCardExpansion('${row[0]}')">
             <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <h4 class="font-semibold text-lg">${musteriAdi}</h4>
-                <p class="text-gray-600 flex items-center gap-1">
-                  <i data-lucide="phone" class="w-4 h-4"></i>
-                  ${musteriTelefon}
-                </p>
-                <p class="text-sm text-gray-500 flex items-center gap-1">
-                  <i data-lucide="calendar" class="w-4 h-4"></i>
-                  Alma: ${row[2] ? new Date(row[2]).toLocaleDateString('tr-TR') : 'Tarih yok'} | Teslim: ${row[3] ? new Date(row[3]).toLocaleDateString('tr-TR') : 'Tarih yok'}
-                </p>
-                <p class="text-sm text-gray-500 flex items-center gap-1">
-                  <i data-lucide="scale" class="w-4 h-4"></i>
-                  ${row[4] || '0'} kg | 
-                  <i data-lucide="dollar-sign" class="w-4 h-4"></i>
-                  ${row[5] || '0'} ₺
-                </p>
-                <p class="text-sm text-gray-500 flex items-center gap-1">
-                  <i data-lucide="settings" class="w-4 h-4"></i>
-                  ${row[6] || 'İşlem yok'}
-                </p>
-                <span class="inline-block px-2 py-1 text-xs rounded ${row[7] === 'Tamamlandı' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${row[7] || 'Beklemede'}</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h4 class="font-semibold text-lg md:text-xl text-gray-900 truncate">${musteriAdi}</h4>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0" id="chevron-${row[0]}"></i>
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-gray-600 flex items-center gap-2">
+                      <i data-lucide="phone" class="w-4 h-4 flex-shrink-0"></i>
+                      <span class="truncate">${musteriTelefon}</span>
+                    </p>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-500">
+                      <div class="flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-4 h-4 flex-shrink-0"></i>
+                        <span>Alma: ${row[2] ? new Date(row[2]).toLocaleDateString('tr-TR') : 'Tarih yok'}</span>
               </div>
-              <div class="flex gap-2 ml-4">
-                <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors flex items-center gap-1" onclick="tamamlaIs('${row[0]}')">
-                  <i data-lucide="check" class="w-3 h-3"></i>
-                  Tamamla
+                      <span class="hidden sm:inline">|</span>
+                      <span>Teslim: ${row[3] ? new Date(row[3]).toLocaleDateString('tr-TR') : 'Tarih yok'}</span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-500">
+                      <div class="flex items-center gap-1">
+                        <i data-lucide="scale" class="w-4 h-4 flex-shrink-0"></i>
+                        <span>${row[4] || '0'} kg</span>
+                      </div>
+                      <span class="hidden sm:inline">|</span>
+                      <div class="flex items-center gap-1">
+                        <i data-lucide="dollar-sign" class="w-4 h-4 flex-shrink-0"></i>
+                        <span>${row[5] || '0'} ₺</span>
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <span id="main-status-${row[0]}" class="inline-block px-3 py-1 text-sm rounded-full font-medium transition-all duration-200 ${row[7] === 'Tamamlandı' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${row[7] || 'Beklemede'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Expanded Content -->
+            <div id="expanded-${row[0]}" class="hidden border-t border-gray-200 p-4 md:p-6 bg-gray-50">
+              <h5 class="font-semibold mb-4 flex items-center gap-2 text-base md:text-lg">
+                <i data-lucide="list" class="w-5 h-5"></i>
+                İşlem Detayları
+              </h5>
+              
+              <!-- İşlem Tablosu/Kartları -->
+              <div class="mb-6">
+                ${islemlerTable}
+              </div>
+              
+              <!-- Eylem Butonları -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-300">
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-base" onclick="duzenleIs('${row[0]}')">
+                  <i data-lucide="edit" class="w-4 h-4"></i>
+                  Düzenle
                 </button>
-                <button class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors flex items-center gap-1" onclick="silIs('${row[0]}')">
-                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                <button class="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-base" onclick="silIs('${row[0]}')">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
                   Sil
                 </button>
               </div>
@@ -1163,10 +1368,190 @@
       goTo('mainMenu');
     }
 
-    async function tamamlaIs(index) {
-      // Bu fonksiyon işi tamamlandı olarak işaretler
-      alert('İş tamamlandı olarak işaretlendi!');
-      loadBekleyenIsler(); // Listeyi yenile
+
+    // Card expansion functionality
+    function toggleCardExpansion(cardId) {
+      const expandedContent = document.getElementById(`expanded-${cardId}`);
+      const chevron = document.getElementById(`chevron-${cardId}`);
+      
+      if (expandedContent.classList.contains('hidden')) {
+        expandedContent.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        expandedContent.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Parse process string and create interactive table/cards for mobile
+    function parseIslemlerToTable(islemlerStr, rowId, processStatuses = {}) {
+      if (!islemlerStr || islemlerStr === 'İşlem yok') {
+        return `
+          <div class="text-center p-6 text-gray-500 bg-gray-50 rounded-lg">
+            <i data-lucide="info" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>İşlem bilgisi bulunamadı</p>
+          </div>
+        `;
+      }
+
+      // Parse the process string (e.g., "Kırma: 60kg, Kavurma: 30kg, Paketleme: 5kg")
+      const processes = islemlerStr.split(',').map(item => item.trim());
+      
+      let processCards = '';
+      
+      processes.forEach((process, index) => {
+        const parts = process.split(':');
+        if (parts.length === 2) {
+          const processType = parts[0].trim();
+          const amount = parts[1].trim();
+          
+          // Gerçek status'ü al, yoksa default 'Bekliyor'
+          const currentStatus = processStatuses[processType] || 'Bekliyor';
+          
+          // Responsive card layout for all screen sizes
+          processCards += `
+            <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex-1">
+                  <h6 class="font-semibold text-gray-900 text-base">${processType}</h6>
+                  <p class="text-sm text-gray-600 mt-1">${amount}</p>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <span id="status-${rowId}-${processType.replace(/\s+/g, '-')}" class="px-3 py-1 text-sm rounded-full ${getStatusColor(currentStatus)} whitespace-nowrap transition-all duration-200">
+                    ${currentStatus}
+                  </span>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Durum Değiştir:</label>
+                <select class="w-full sm:max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" onchange="updateIslemStatus('${rowId}', '${processType}', this.value)">
+                  <option value="Bekliyor" ${currentStatus === 'Bekliyor' ? 'selected' : ''}>Bekliyor</option>
+                  <option value="İşleniyor" ${currentStatus === 'İşleniyor' ? 'selected' : ''}>İşleniyor</option>
+                  <option value="İşlendi" ${currentStatus === 'İşlendi' ? 'selected' : ''}>İşlendi</option>
+                </select>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      return `
+        <!-- Mobile-First Card Layout - Visible on All Screens -->
+        <div class="space-y-3">
+          ${processCards}
+        </div>
+      `;
+    }
+
+    // Get status color classes
+    function getStatusColor(status) {
+      switch (status) {
+        case 'Bekliyor':
+          return 'bg-yellow-100 text-yellow-800 font-medium';
+        case 'İşleniyor':
+          return 'bg-blue-100 text-blue-800 font-medium';
+        case 'İşlendi':
+          return 'bg-green-100 text-green-800 font-medium';
+        default:
+          return 'bg-gray-100 text-gray-800 font-medium';
+      }
+    }
+
+    // Update process status
+    async function updateIslemStatus(rowId, processType, newStatus) {
+      // Update the visual status badge immediately
+      const statusId = `status-${rowId}-${processType.replace(/\s+/g, '-')}`;
+      const statusBadge = document.getElementById(statusId);
+      
+      if (statusBadge) {
+        // Update text content
+        statusBadge.textContent = newStatus;
+        
+        // Remove all existing status classes
+        statusBadge.className = 'px-3 py-1 text-sm rounded-full whitespace-nowrap transition-all duration-200';
+        
+        // Add new status-specific classes
+        statusBadge.className += ' ' + getStatusColor(newStatus);
+        
+        // Brief success animation
+        statusBadge.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          statusBadge.style.transform = 'scale(1)';
+        }, 150);
+      }
+      
+      // Update main card status based on all process statuses
+      setTimeout(() => {
+        updateMainCardStatus(rowId);
+      }, 100);
+      
+      // Show success message
+      const message = `${processType} durumu "${newStatus}" olarak güncellendi!`;
+      
+      setTimeout(() => {
+        alert(message);
+      }, 300);
+      
+      // Veritabanını güncelle (Google Sheets)
+      try {
+        await updateProcessStatusInDatabase(rowId, processType, newStatus);
+      } catch (error) {
+        // Hata durumunda kullanıcıya bilgi ver ama badge'i geri çevirme
+        // çünkü kullanıcı deneyimi için frontend'te güncellenmiş kalsın
+      }
+    }
+    
+    // Update main card status based on all process statuses
+    function updateMainCardStatus(rowId) {
+      // Find all status badges for this row
+      const expandedContent = document.getElementById(`expanded-${rowId}`);
+      if (!expandedContent) {
+        return;
+      }
+      
+      const statusBadges = expandedContent.querySelectorAll('[id^="status-' + rowId + '-"]');
+      const statuses = Array.from(statusBadges).map(badge => badge.textContent.trim());
+      
+      // Determine overall status
+      let overallStatus = 'Beklemede';
+      let overallStatusColor = 'bg-yellow-100 text-yellow-800';
+      
+      if (statuses.length > 0) {
+        const completedCount = statuses.filter(s => s === 'İşlendi').length;
+        const inProgressCount = statuses.filter(s => s === 'İşleniyor').length;
+        
+        if (completedCount === statuses.length) {
+          // All processes are completed
+          overallStatus = 'Tamamlandı';
+          overallStatusColor = 'bg-green-100 text-green-800';
+        } else if (inProgressCount > 0 || completedCount > 0) {
+          // Any process is in progress or completed
+          overallStatus = 'İşleniyor';
+          overallStatusColor = 'bg-blue-100 text-blue-800';
+        }
+      }
+      
+      // Update main status badge
+      const mainStatusBadge = document.getElementById(`main-status-${rowId}`);
+      if (mainStatusBadge) {
+        mainStatusBadge.textContent = overallStatus;
+        
+        // Remove all existing status classes and add new ones
+        mainStatusBadge.className = 'inline-block px-3 py-1 text-sm rounded-full font-medium transition-all duration-200 ' + overallStatusColor;
+        
+        // Brief success animation for main badge
+        mainStatusBadge.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+          mainStatusBadge.style.transform = 'scale(1)';
+        }, 200);
+      }
+    }
+
+    // Edit job functionality
+    function duzenleIs(rowId) {
+      alert(`İş düzenleme özelliği geliştirilecek. İş ID: ${rowId}`);
+      // TODO: Implement edit functionality
+      // This could open a modal or navigate to an edit form
     }
 
     async function silIs(index) {
@@ -1174,6 +1559,796 @@
         alert('İş silindi!');
         loadBekleyenIsler(); // Listeyi yenile
       }
+    }
+
+    // Customer expansion functionality
+    function toggleCustomerExpansion(customerId) {
+      const expandedContent = document.getElementById(`customer-expanded-${customerId}`);
+      const chevron = document.getElementById(`customer-chevron-${customerId}`);
+      
+      if (expandedContent.classList.contains('hidden')) {
+        expandedContent.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+        // Load customer jobs when expanding
+        loadCustomerJobs(customerId);
+      } else {
+        expandedContent.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Load jobs for specific customer
+    async function loadCustomerJobs(customerId) {
+      const jobsContainer = document.getElementById(`customer-jobs-${customerId}`);
+      
+      try {
+        // Fetch both job data and customer data
+        const [malKabulRes, musteriRes] = await Promise.all([
+          fetch(SCRIPT_URL + '?type=malKabul'),
+          fetch(SCRIPT_URL + '?type=musteriler')
+        ]);
+        
+        const malKabulData = await malKabulRes.json();
+        const musteriData = await musteriRes.json();
+        
+        // Filter jobs for this customer
+        let malKabulToShow = malKabulData;
+        if (malKabulData[0] && malKabulData[0][0] === 'ID') {
+          malKabulToShow = malKabulData.slice(1);
+        }
+        
+        const customerJobs = malKabulToShow.filter(row => row[1] == customerId); // Müşteri ID comparison
+        
+        if (customerJobs.length === 0) {
+          jobsContainer.innerHTML = `
+            <div class="text-center py-6 text-gray-500">
+              <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2"></i>
+              <p>Bu müşteriye ait iş bulunmuyor</p>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+        
+        // Create process summary - count all individual processes
+        let totalProcesses = 0;
+        let completedProcesses = 0;
+        let inProgressProcesses = 0;
+        let pendingProcesses = 0;
+        
+        customerJobs.forEach(job => {
+          const processes = job[6] || 'İşlem yok';
+          const processStatuses = job[9] ? JSON.parse(job[9]) : {};
+          
+          if (processes && processes !== 'İşlem yok') {
+            const processLines = processes.split(',').map(line => line.trim());
+            processLines.forEach(line => {
+              const parts = line.split(':');
+              if (parts.length === 2) {
+                const processType = parts[0].trim();
+                const currentStatus = processStatuses[processType] || 'Bekliyor';
+                
+                totalProcesses++;
+                if (currentStatus === 'İşlendi') {
+                  completedProcesses++;
+                } else if (currentStatus === 'İşleniyor') {
+                  inProgressProcesses++;
+                } else {
+                  pendingProcesses++;
+                }
+              }
+            });
+          }
+        });
+        
+        let jobsHtml = `
+          <!-- Process Summary -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-blue-100 p-3 rounded-lg text-center">
+              <div class="text-2xl font-bold text-blue-800">${totalProcesses}</div>
+              <div class="text-sm text-blue-600">Toplam İşlem</div>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg text-center">
+              <div class="text-2xl font-bold text-green-800">${completedProcesses}</div>
+              <div class="text-sm text-green-600">Tamamlandı</div>
+            </div>
+            <div class="bg-orange-100 p-3 rounded-lg text-center">
+              <div class="text-2xl font-bold text-orange-800">${inProgressProcesses}</div>
+              <div class="text-sm text-orange-600">İşleniyor</div>
+            </div>
+            <div class="bg-yellow-100 p-3 rounded-lg text-center">
+              <div class="text-2xl font-bold text-yellow-800">${pendingProcesses}</div>
+              <div class="text-sm text-yellow-600">Beklemede</div>
+            </div>
+          </div>
+          
+          <!-- Job List -->
+          <div class="space-y-3">
+        `;
+        
+        customerJobs.forEach(job => {
+          const jobDate = job[2] ? new Date(job[2]).toLocaleDateString('tr-TR') : 'Tarih yok';
+          const deliveryDate = job[3] ? new Date(job[3]).toLocaleDateString('tr-TR') : 'Tarih yok';
+          const status = job[7] || 'Beklemede';
+          const processes = job[6] || 'İşlem yok';
+          const processStatuses = job[9] ? JSON.parse(job[9]) : {};
+          
+          let statusColor = 'bg-yellow-100 text-yellow-800';
+          if (status === 'Tamamlandı') statusColor = 'bg-green-100 text-green-800';
+          else if (status === 'İşleniyor') statusColor = 'bg-blue-100 text-blue-800';
+          
+          // Parse process details
+          let processDetailsHtml = '';
+          if (processes && processes !== 'İşlem yok') {
+            const processLines = processes.split(',').map(line => line.trim());
+            processDetailsHtml = `
+              <div class="mt-4 space-y-3">
+                <h6 class="font-medium text-gray-900 text-sm flex items-center gap-2">
+                  <i data-lucide="settings" class="w-4 h-4"></i>
+                  İşlem Detayları
+                </h6>
+                <div class="grid gap-2">
+            `;
+            
+            processLines.forEach(line => {
+              const parts = line.split(':');
+              if (parts.length === 2) {
+                const processType = parts[0].trim();
+                const amount = parts[1].trim();
+                const currentStatus = processStatuses[processType] || 'Bekliyor';
+                
+                let processStatusColor = 'bg-yellow-100 text-yellow-700';
+                if (currentStatus === 'İşlendi') processStatusColor = 'bg-green-100 text-green-700';
+                else if (currentStatus === 'İşleniyor') processStatusColor = 'bg-blue-100 text-blue-700';
+                
+                processDetailsHtml += `
+                  <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-2">
+                      <span class="font-medium text-sm text-gray-900">${processType}</span>
+                      <span class="text-sm text-gray-600">${amount}</span>
+                    </div>
+                    <span class="px-2 py-1 text-xs rounded-full font-medium ${processStatusColor}">
+                      ${currentStatus}
+                    </span>
+                  </div>
+                `;
+              }
+            });
+            
+            processDetailsHtml += `
+                </div>
+              </div>
+            `;
+          }
+          
+          jobsHtml += `
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <div class="flex flex-col gap-3">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-3">
+                      <i data-lucide="calendar" class="w-4 h-4 text-gray-400"></i>
+                      <span class="text-sm text-gray-600">${jobDate}</span>
+                      <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                      <span class="text-sm text-gray-600">${deliveryDate}</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                      <div class="flex items-center gap-1">
+                        <i data-lucide="scale" class="w-4 h-4"></i>
+                        <span>${job[4] || '0'} kg</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                        <span>${job[5] || '0'} ₺</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="px-3 py-1 text-sm rounded-full font-medium ${statusColor}">${status}</span>
+                  </div>
+                </div>
+                ${processDetailsHtml}
+              </div>
+            </div>
+          `;
+        });
+        
+        jobsHtml += '</div>';
+        jobsContainer.innerHTML = jobsHtml;
+        lucide.createIcons();
+        
+      } catch (error) {
+        jobsContainer.innerHTML = `
+          <div class="text-center py-6 text-red-500">
+            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>İşler yüklenirken hata oluştu</p>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+
+    // Calendar functionality
+    let currentDate = new Date();
+    let calendarView = 'month';
+    let calendarJobs = [];
+
+    async function loadCalendarData() {
+      try {
+        // Fetch jobs and customer data
+        const [malKabulRes, musteriRes] = await Promise.all([
+          fetch(SCRIPT_URL + '?type=malKabul'),
+          fetch(SCRIPT_URL + '?type=musteriler')
+        ]);
+        
+        const malKabulData = await malKabulRes.json();
+        const musteriData = await musteriRes.json();
+        
+        // Filter out header row if exists
+        let malKabulToShow = malKabulData;
+        if (malKabulData[0] && malKabulData[0][0] === 'ID') {
+          malKabulToShow = malKabulData.slice(1);
+        }
+        
+        let musteriToShow = musteriData;
+        if (musteriData[0] && musteriData[0][0] === 'ID') {
+          musteriToShow = musteriData.slice(1);
+        }
+        
+        // Create customer lookup
+        const customerLookup = {};
+        musteriToShow.forEach(customer => {
+          customerLookup[customer[0]] = customer[1]; // ID -> Name
+        });
+        
+        // Process jobs for calendar
+        calendarJobs = malKabulToShow.map(job => ({
+          id: job[0],
+          customerId: job[1],
+          customerName: customerLookup[job[1]] || 'Bilinmeyen Müşteri',
+          startDate: job[2] ? new Date(job[2]) : null,
+          endDate: job[3] ? new Date(job[3]) : null,
+          weight: job[4] || '0',
+          price: job[5] || '0',
+          processes: job[6] || 'İşlem yok',
+          status: job[7] || 'Beklemede',
+          processStatuses: job[9] ? JSON.parse(job[9]) : {}
+        })).filter(job => job.startDate && job.endDate); // Only show jobs with valid dates
+        
+        renderCalendar();
+        
+      } catch (error) {
+        document.getElementById('calendarContainer').innerHTML = `
+          <div class="text-center py-8 text-red-500">
+            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+            <p>Takvim verisi yüklenirken hata oluştu</p>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function renderCalendar() {
+      const container = document.getElementById('calendarContainer');
+      const currentPeriod = document.getElementById('currentPeriod');
+      
+      if (calendarView === 'month') {
+        renderMonthView();
+      } else {
+        renderWeekView();
+      }
+      
+      lucide.createIcons();
+    }
+
+    function renderMonthView() {
+      const container = document.getElementById('calendarContainer');
+      const currentPeriod = document.getElementById('currentPeriod');
+      
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      // Set period title
+      const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                         'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+      currentPeriod.textContent = `${monthNames[month]} ${year}`;
+      
+      // Get first day of month and days in month
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+      
+      // Calculate days to show from previous month
+      const prevMonthDays = startingDayOfWeek === 0 ? 0 : startingDayOfWeek;
+      const prevMonth = new Date(year, month - 1, 0);
+      
+      let calendarHtml = `
+        <div class="grid grid-cols-7 gap-1 mb-4">
+          <div class="text-center font-semibold text-gray-600 p-2">Paz</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Pzt</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Sal</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Çar</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Per</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Cum</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Cmt</div>
+        </div>
+        <div class="grid grid-cols-7 gap-1">
+      `;
+      
+      // Previous month days
+      for (let i = prevMonthDays - 1; i >= 0; i--) {
+        const day = prevMonth.getDate() - i;
+        calendarHtml += `
+          <div class="min-h-[80px] p-1 bg-gray-50 border rounded">
+            <div class="text-xs text-gray-400 mb-1">${day}</div>
+          </div>
+        `;
+      }
+      
+      // Current month days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const currentDateObj = new Date(year, month, day);
+        const dayJobs = getDayJobs(currentDateObj);
+        const isToday = isSameDay(currentDateObj, new Date());
+        
+        calendarHtml += `
+          <div class="min-h-[80px] p-1 border rounded ${isToday ? 'bg-blue-50 border-blue-300' : 'bg-white'} hover:bg-gray-50 cursor-pointer" onclick="showDayJobs('${currentDateObj.toISOString()}')">
+            <div class="text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : 'text-gray-900'}">${day}</div>
+            <div class="space-y-1">
+              ${dayJobs.map(job => `
+                <div class="text-xs p-1 rounded truncate ${getJobColor(job)} cursor-pointer" onclick="event.stopPropagation(); showJobDetails('${job.id}')" title="${job.customerName}">
+                  ${job.customerName.substring(0, 10)}${job.customerName.length > 10 ? '...' : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Next month days to complete the grid
+      const totalCells = Math.ceil((prevMonthDays + daysInMonth) / 7) * 7;
+      const nextMonthDays = totalCells - (prevMonthDays + daysInMonth);
+      
+      for (let day = 1; day <= nextMonthDays; day++) {
+        calendarHtml += `
+          <div class="min-h-[80px] p-1 bg-gray-50 border rounded">
+            <div class="text-xs text-gray-400 mb-1">${day}</div>
+          </div>
+        `;
+      }
+      
+      calendarHtml += '</div>';
+      container.innerHTML = calendarHtml;
+    }
+
+    function renderWeekView() {
+      const container = document.getElementById('calendarContainer');
+      const currentPeriod = document.getElementById('currentPeriod');
+      
+      // Get start of week (Sunday)
+      const startOfWeek = new Date(currentDate);
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+      
+      // Set period title
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      
+      currentPeriod.textContent = `${startOfWeek.toLocaleDateString('tr-TR')} - ${endOfWeek.toLocaleDateString('tr-TR')}`;
+      
+      let calendarHtml = `
+        <div class="grid grid-cols-7 gap-2">
+          <div class="text-center font-semibold text-gray-600 p-2">Pazar</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Pazartesi</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Salı</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Çarşamba</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Perşembe</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Cuma</div>
+          <div class="text-center font-semibold text-gray-600 p-2">Cumartesi</div>
+      `;
+      
+      // Week days
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(startOfWeek);
+        dayDate.setDate(startOfWeek.getDate() + i);
+        const dayJobs = getDayJobs(dayDate);
+        const isToday = isSameDay(dayDate, new Date());
+        
+        calendarHtml += `
+          <div class="min-h-[200px] p-2 border rounded ${isToday ? 'bg-blue-50 border-blue-300' : 'bg-white'} hover:bg-gray-50">
+            <div class="text-lg font-semibold mb-2 ${isToday ? 'text-blue-600' : 'text-gray-900'}">${dayDate.getDate()}</div>
+            <div class="space-y-2">
+              ${dayJobs.map(job => `
+                <div class="text-sm p-2 rounded ${getJobColor(job)} cursor-pointer" onclick="showJobDetails('${job.id}')" title="Detay için tıkla">
+                  <div class="font-medium truncate">${job.customerName}</div>
+                  <div class="text-xs opacity-75">${job.weight}kg - ${job.price}₺</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      calendarHtml += '</div>';
+      container.innerHTML = calendarHtml;
+    }
+
+    function getDayJobs(date) {
+      return calendarJobs.filter(job => {
+        return (isSameDay(job.startDate, date) || isSameDay(job.endDate, date) ||
+               (job.startDate <= date && job.endDate >= date));
+      });
+    }
+
+    function getJobColor(job) {
+      if (job.status === 'Tamamlandı') return 'bg-green-100 text-green-800 border border-green-200';
+      if (job.status === 'İşleniyor') return 'bg-blue-100 text-blue-800 border border-blue-200';
+      return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+    }
+
+    function isSameDay(date1, date2) {
+      return date1.getFullYear() === date2.getFullYear() &&
+             date1.getMonth() === date2.getMonth() &&
+             date1.getDate() === date2.getDate();
+    }
+
+    function changeCalendarView() {
+      calendarView = document.getElementById('calendarView').value;
+      renderCalendar();
+    }
+
+    function previousPeriod() {
+      if (calendarView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+      } else {
+        currentDate.setDate(currentDate.getDate() - 7);
+      }
+      renderCalendar();
+    }
+
+    function nextPeriod() {
+      if (calendarView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      } else {
+        currentDate.setDate(currentDate.getDate() + 7);
+      }
+      renderCalendar();
+    }
+
+    function showJobDetails(jobId) {
+      const job = calendarJobs.find(j => j.id == jobId);
+      if (!job) return;
+      
+      const modal = document.getElementById('jobDetailsModal');
+      const content = document.getElementById('jobModalContent');
+      
+      // Parse process details
+      let processDetailsHtml = '';
+      if (job.processes && job.processes !== 'İşlem yok') {
+        const processLines = job.processes.split(',').map(line => line.trim());
+        processDetailsHtml = `
+          <div class="mt-6">
+            <h4 class="font-medium text-gray-900 mb-3 flex items-center gap-2">
+              <i data-lucide="settings" class="w-4 h-4"></i>
+              İşlem Detayları
+            </h4>
+            <div class="grid gap-2">
+        `;
+        
+        processLines.forEach(line => {
+          const parts = line.split(':');
+          if (parts.length === 2) {
+            const processType = parts[0].trim();
+            const amount = parts[1].trim();
+            const currentStatus = job.processStatuses[processType] || 'Bekliyor';
+            
+            let processStatusColor = 'bg-yellow-100 text-yellow-700';
+            if (currentStatus === 'İşlendi') processStatusColor = 'bg-green-100 text-green-700';
+            else if (currentStatus === 'İşleniyor') processStatusColor = 'bg-blue-100 text-blue-700';
+            
+            processDetailsHtml += `
+              <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-sm">${processType}</span>
+                  <span class="text-sm text-gray-600">${amount}</span>
+                </div>
+                <span class="px-2 py-1 text-xs rounded-full font-medium ${processStatusColor}">
+                  ${currentStatus}
+                </span>
+              </div>
+            `;
+          }
+        });
+        
+        processDetailsHtml += `
+            </div>
+          </div>
+        `;
+      }
+      
+      const statusColor = getJobColor(job).split(' ')[0] + '-800';
+      
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xl font-semibold">${job.customerName}</h4>
+            <span class="px-3 py-1 rounded-full text-sm font-medium ${getJobColor(job)}">${job.status}</span>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 text-gray-600">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span class="text-sm">Başlangıç: ${job.startDate.toLocaleDateString('tr-TR')}</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                <span class="text-sm">Teslim: ${job.endDate.toLocaleDateString('tr-TR')}</span>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 text-gray-600">
+                <i data-lucide="scale" class="w-4 h-4"></i>
+                <span class="text-sm">${job.weight} kg</span>
+              </div>
+              <div class="flex items-center gap-2 text-gray-600">
+                <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                <span class="text-sm">${job.price} ₺</span>
+              </div>
+            </div>
+          </div>
+          
+          ${processDetailsHtml}
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeJobModal() {
+      document.getElementById('jobDetailsModal').classList.add('hidden');
+    }
+
+    function showDayJobs(dateStr) {
+      const date = new Date(dateStr);
+      const dayJobs = getDayJobs(date);
+      
+      if (dayJobs.length === 0) {
+        return;
+      }
+      
+      if (dayJobs.length === 1) {
+        // Single job, show details directly
+        showJobDetails(dayJobs[0].id);
+        return;
+      }
+      
+      // Multiple jobs, show day jobs modal
+      const modal = document.getElementById('dayJobsModal');
+      const title = document.getElementById('dayJobsTitle');
+      const content = document.getElementById('dayJobsContent');
+      
+      // Set title
+      const formattedDate = date.toLocaleDateString('tr-TR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      title.textContent = `${formattedDate} - ${dayJobs.length} İş`;
+      
+      // Group jobs by type (start date vs end date vs in between)
+      const startJobs = [];
+      const endJobs = [];
+      const ongoingJobs = [];
+      
+      dayJobs.forEach(job => {
+        if (isSameDay(job.startDate, date)) {
+          startJobs.push(job);
+        } else if (isSameDay(job.endDate, date)) {
+          endJobs.push(job);
+        } else {
+          ongoingJobs.push(job);
+        }
+      });
+      
+      let contentHtml = '';
+      
+      // Summary stats
+      const totalJobs = dayJobs.length;
+      const completedJobs = dayJobs.filter(job => job.status === 'Tamamlandı').length;
+      const inProgressJobs = dayJobs.filter(job => job.status === 'İşleniyor').length;
+      const pendingJobs = dayJobs.filter(job => job.status === 'Beklemede').length;
+      
+      contentHtml += `
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-blue-100 p-3 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-800">${totalJobs}</div>
+            <div class="text-sm text-blue-600">Toplam</div>
+          </div>
+          <div class="bg-green-100 p-3 rounded-lg text-center">
+            <div class="text-2xl font-bold text-green-800">${completedJobs}</div>
+            <div class="text-sm text-green-600">Tamamlandı</div>
+          </div>
+          <div class="bg-orange-100 p-3 rounded-lg text-center">
+            <div class="text-2xl font-bold text-orange-800">${inProgressJobs}</div>
+            <div class="text-sm text-orange-600">İşleniyor</div>
+          </div>
+          <div class="bg-yellow-100 p-3 rounded-lg text-center">
+            <div class="text-2xl font-bold text-yellow-800">${pendingJobs}</div>
+            <div class="text-sm text-yellow-600">Beklemede</div>
+          </div>
+        </div>
+      `;
+      
+      // Jobs starting today
+      if (startJobs.length > 0) {
+        contentHtml += `
+          <div class="mb-6">
+            <h4 class="flex items-center gap-2 text-lg font-semibold mb-4 text-green-700">
+              <i data-lucide="play-circle" class="w-5 h-5"></i>
+              Başlayan İşler (${startJobs.length})
+            </h4>
+            <div class="space-y-3">
+              ${startJobs.map(job => createJobCard(job, 'start')).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Jobs ending today
+      if (endJobs.length > 0) {
+        contentHtml += `
+          <div class="mb-6">
+            <h4 class="flex items-center gap-2 text-lg font-semibold mb-4 text-red-700">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+              Teslim Edilen İşler (${endJobs.length})
+            </h4>
+            <div class="space-y-3">
+              ${endJobs.map(job => createJobCard(job, 'end')).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Ongoing jobs
+      if (ongoingJobs.length > 0) {
+        contentHtml += `
+          <div class="mb-6">
+            <h4 class="flex items-center gap-2 text-lg font-semibold mb-4 text-blue-700">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              Devam Eden İşler (${ongoingJobs.length})
+            </h4>
+            <div class="space-y-3">
+              ${ongoingJobs.map(job => createJobCard(job, 'ongoing')).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      content.innerHTML = contentHtml;
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function createJobCard(job, type) {
+      let typeIndicator = '';
+      let typeColor = 'border-gray-200';
+      
+      if (type === 'start') {
+        typeIndicator = '<i data-lucide="arrow-right" class="w-4 h-4 text-green-600"></i> Başlıyor';
+        typeColor = 'border-l-4 border-green-500';
+      } else if (type === 'end') {
+        typeIndicator = '<i data-lucide="flag" class="w-4 h-4 text-red-600"></i> Teslim';
+        typeColor = 'border-l-4 border-red-500';
+      } else {
+        typeIndicator = '<i data-lucide="activity" class="w-4 h-4 text-blue-600"></i> Devam Ediyor';
+        typeColor = 'border-l-4 border-blue-500';
+      }
+      
+      // Calculate process summary
+      let processCount = 0;
+      let completedProcessCount = 0;
+      
+      if (job.processes && job.processes !== 'İşlem yok') {
+        const processLines = job.processes.split(',').map(line => line.trim());
+        processLines.forEach(line => {
+          const parts = line.split(':');
+          if (parts.length === 2) {
+            const processType = parts[0].trim();
+            const currentStatus = job.processStatuses[processType] || 'Bekliyor';
+            processCount++;
+            if (currentStatus === 'İşlendi') {
+              completedProcessCount++;
+            }
+          }
+        });
+      }
+      
+      return `
+        <div class="bg-white border ${typeColor} rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="showJobDetailsFromDay('${job.id}')">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <h5 class="font-semibold text-lg text-gray-900">${job.customerName}</h5>
+                <span class="px-3 py-1 text-sm rounded-full font-medium ${getJobColor(job)}">${job.status}</span>
+              </div>
+              
+              <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                ${typeIndicator}
+              </div>
+              
+              <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                <div class="flex items-center gap-1">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                  <span>${job.startDate.toLocaleDateString('tr-TR')}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                  <span>${job.endDate.toLocaleDateString('tr-TR')}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <i data-lucide="scale" class="w-4 h-4"></i>
+                  <span>${job.weight} kg</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                  <span>${job.price} ₺</span>
+                </div>
+              </div>
+              
+              ${processCount > 0 ? `
+                <div class="flex items-center gap-2 text-sm">
+                  <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
+                  <span class="text-gray-600">${completedProcessCount}/${processCount} işlem tamamlandı</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: ${processCount > 0 ? (completedProcessCount / processCount) * 100 : 0}%"></div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showJobDetailsFromDay(jobId) {
+      closeDayJobsModal();
+      setTimeout(() => {
+        showJobDetails(jobId);
+      }, 300);
+    }
+
+    function closeDayJobsModal() {
+      document.getElementById('dayJobsModal').classList.add('hidden');
+    }
+
+    // Database update functions
+    async function updateProcessStatusInDatabase(rowId, processType, newStatus) {
+      const data = {
+        type: 'updateProcessStatus',
+        rowId: rowId,
+        processType: processType,
+        newStatus: newStatus
+      };
+
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      return result;
     }
 
     // Initialize routing when page loads
