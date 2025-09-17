@@ -63,195 +63,132 @@
     
   </div>
 
-  <!-- Mal Kabul Adım Adım Süreç -->
+  <!-- Mal Kabul Formu -->
   <div id="malKabulForm" class="hidden mt-6">
-    <!-- Progress Bar -->
-    <div class="mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium text-gray-700">Adım <span id="currentStep">1</span> / 4</span>
-        <span class="text-sm text-gray-500" id="stepTitle">Müşteri Bilgileri</span>
-      </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
-      </div>
-    </div>
-
-    <!-- Step 1: Müşteri Bilgileri -->
-    <div id="step1" class="step-content">
-      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-        <i data-lucide="user" class="w-6 h-6"></i>
-        Müşteri Bilgileri
-      </h2>
-      <div class="bg-white p-6 rounded-lg shadow space-y-4">
+    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+      <i data-lucide="package" class="w-6 h-6"></i>
+      Mal Kabul Formu
+    </h2>
+    
+    <form id="malKabulFormElement" class="bg-white rounded-lg shadow-lg p-6 space-y-6">
+      <!-- Müşteri Bilgileri -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2">Ad Soyad *</label>
           <input type="text" id="adsoyad" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Müşteri adı ve soyadı" required autocomplete="off">
           <div id="customerSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Cep Telefonu *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">GSM *</label>
           <input type="tel" id="cep" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="0555 123 45 67" required>
         </div>
-        <div class="flex gap-4">
-          <div class="flex-1">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Alma Tarihi *</label>
-            <input type="date" id="almaTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
-          </div>
-          <div class="flex-1">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teslim Tarihi *</label>
-            <input type="date" id="teslimTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
-          </div>
-        </div>
-        <div class="flex gap-4">
-          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="goTo('mainMenu')">İptal</button>
-          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
-        </div>
       </div>
-    </div>
 
-    <!-- Step 2: Ürün Detayları -->
-    <div id="step2" class="step-content hidden">
-      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-        <i data-lucide="package" class="w-6 h-6"></i>
-        Ürün Detayları
-      </h2>
-      <div class="bg-white p-6 rounded-lg shadow space-y-4">
+      <!-- Miktar ve Fiyat -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Toplam Ağırlık (kg) *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Miktar (kg) *</label>
           <input type="number" id="toplamKg" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Örn: 100" step="0.1" required>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Fiyat (₺) *</label>
           <input type="number" id="fiyat" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" placeholder="Örn: 1500" step="0.01" required>
         </div>
+      </div>
+
+      <!-- İşlem Türleri -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">İşlem Türleri</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <label class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" id="islemKirim" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium">Kırım</span>
+          </label>
+          <label class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" id="islemKavurma" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium">Kavurma</span>
+          </label>
+          <label class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" id="islemEzme" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium">Ezme</span>
+          </label>
+          <label class="flex items-center space-x-2 bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" id="islemKP" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium">K+K+P</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Paket Seçenekleri -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">Paket Seçenekleri</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">250g</span>
+            <input type="checkbox" id="paket250" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">400g</span>
+            <input type="checkbox" id="paket400" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">500g</span>
+            <input type="checkbox" id="paket500" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">1000g</span>
+            <input type="checkbox" id="paket1000" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+        </div>
+      </div>
+
+      <!-- Ezme Seçeneği -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">Ezme Seçeneği</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">300g</span>
+            <input type="checkbox" id="ezme300" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+          <label class="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100">
+            <span class="text-sm font-medium">500g</span>
+            <input type="checkbox" id="ezme500" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+          </label>
+        </div>
+      </div>
+
+      <!-- Tarihler -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Açıklaması</label>
-          <textarea id="urunAciklama" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Ürün hakkında ek bilgiler..."></textarea>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Alım Tarihi *</label>
+          <input type="date" id="almaTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
         </div>
-        <div class="flex gap-4">
-          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
-          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Teslim Tarihi *</label>
+          <input type="date" id="teslimTarihi" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" required>
         </div>
       </div>
-    </div>
 
-    <!-- Step 3: İşlem Seçimi -->
-    <div id="step3" class="step-content hidden">
-      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-        <i data-lucide="settings" class="w-6 h-6"></i>
-        İşlem Seçimi
-      </h2>
-      <div class="bg-white p-6 rounded-lg shadow">
-        <p class="text-gray-700 mb-4">Toplam: <span id="kgBilgi" class="font-semibold text-blue-600"></span> kg fındık için işlem türlerini seçin:</p>
-        <div class="grid gap-3 mb-6">
-          <button class="bg-red-100 hover:bg-red-200 text-red-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('İşlenmeyecek')">
-            <div class="mb-2 flex justify-center">
-              <i data-lucide="x-circle" class="w-8 h-8"></i>
-            </div>
-            <div class="font-semibold">İşlenmeyecek</div>
-            <div class="text-sm text-red-600">Ham olarak teslim</div>
-          </button>
-          <button class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Kırma')">
-            <div class="mb-2 flex justify-center">
-              <i data-lucide="hammer" class="w-8 h-8"></i>
-            </div>
-            <div class="font-semibold">Kırma</div>
-            <div class="text-sm text-yellow-600">Kabuk kırma işlemi</div>
-          </button>
-          <button class="bg-orange-100 hover:bg-orange-200 text-orange-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Kavurma')">
-            <div class="mb-2 flex justify-center">
-              <i data-lucide="flame" class="w-8 h-8"></i>
-            </div>
-            <div class="font-semibold">Kavurma</div>
-            <div class="text-sm text-orange-600">Kavurma işlemi</div>
-          </button>
-          <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Paketleme')">
-            <div class="mb-2 flex justify-center">
-              <i data-lucide="package-2" class="w-8 h-8"></i>
-            </div>
-            <div class="font-semibold">Paketleme</div>
-            <div class="text-sm text-blue-600">Paketleme işlemi</div>
-          </button>
-          <button class="bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg p-4 text-center transition-colors" onclick="ekleIslem('Ezme')">
-            <div class="mb-2 flex justify-center">
-              <i data-lucide="zap" class="w-8 h-8"></i>
-            </div>
-            <div class="font-semibold">Ezme</div>
-            <div class="text-sm text-purple-600">Ezme işlemi</div>
-          </button>
-        </div>
-        
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="font-semibold mb-3 text-gray-800">Seçilen İşlemler:</h3>
-          <ul id="islemListesi" class="space-y-2">
-            <li class="text-gray-500 text-sm">Henüz işlem seçilmedi</li>
-          </ul>
-          <div class="mt-3 pt-3 border-t border-gray-200">
-            <p class="text-sm text-gray-600">Kalan: <span id="kalanKg" class="font-bold text-blue-600">0</span> kg</p>
-          </div>
-        </div>
-        
-        <div class="flex gap-4 mt-6">
-          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
-          <button type="button" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium" onclick="nextStep()">İleri</button>
-        </div>
+      <!-- Açıklamalar -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Açıklamalar</label>
+        <textarea id="urunAciklama" class="w-full rounded border-gray-300 focus:ring-2 focus:ring-blue-500" rows="3" placeholder="İsteğe bağlı açıklamalar..."></textarea>
       </div>
-    </div>
 
-    <!-- Step 4: Özet ve Onay -->
-    <div id="step4" class="step-content hidden">
-      <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-        <i data-lucide="check-circle" class="w-6 h-6"></i>
-        Özet ve Onay
-      </h2>
-      <div class="bg-white p-6 rounded-lg shadow">
-        <div class="space-y-4">
-          <div class="border-b pb-4">
-            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
-              <i data-lucide="user" class="w-5 h-5"></i>
-              Müşteri Bilgileri
-            </h3>
-            <p><span class="font-medium">Ad Soyad:</span> <span id="summaryAdSoyad"></span></p>
-            <p><span class="font-medium">Telefon:</span> <span id="summaryCep"></span></p>
-            <p><span class="font-medium">Alma Tarihi:</span> <span id="summaryAlmaTarihi"></span></p>
-            <p><span class="font-medium">Teslim Tarihi:</span> <span id="summaryTeslimTarihi"></span></p>
+      <!-- Form Butonları -->
+      <div class="flex gap-4 pt-4">
+        <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors" onclick="goTo('mainMenu')">İptal</button>
+        <button type="submit" id="completeButton" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+          <span id="completeButtonText">Kaydet</span>
+          <div id="completeButtonLoader" class="hidden">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
           </div>
-          
-          <div class="border-b pb-4">
-            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
-              <i data-lucide="package" class="w-5 h-5"></i>
-              Ürün Bilgileri
-            </h3>
-            <p><span class="font-medium">Toplam Ağırlık:</span> <span id="summaryToplamKg"></span> kg</p>
-            <p><span class="font-medium">Fiyat:</span> <span id="summaryFiyat"></span> ₺</p>
-            <p><span class="font-medium">Açıklama:</span> <span id="summaryUrunAciklama"></span></p>
-          </div>
-          
-          <div>
-            <h3 class="font-semibold text-lg text-gray-800 mb-2 flex items-center gap-2">
-              <i data-lucide="settings" class="w-5 h-5"></i>
-              Seçilen İşlemler
-            </h3>
-            <ul id="summaryIslemler" class="space-y-1">
-              <!-- İşlemler buraya eklenecek -->
-            </ul>
-          </div>
-        </div>
-        
-        <div class="flex gap-4 mt-6">
-          <button type="button" class="flex-1 bg-gray-500 text-white py-3 rounded-lg font-medium" onclick="prevStep()">Geri</button>
-          <button type="button" id="completeButton" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2" onclick="completeMalKabul()">
-            <span id="completeButtonText">Tamamla</span>
-            <div id="completeButtonLoader" class="hidden">
-              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-          </button>
-        </div>
+        </button>
       </div>
-    </div>
+    </form>
   </div>
 
 
@@ -459,12 +396,8 @@
     // Google Apps Script URL - Bu URL'yi kendi Google Apps Script'inizle değiştirin
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfEUVwnTD0wApTxkpJhEQTv-uZoeC54C3Npt_pg_5c-mbAtmmMYng1CjrMsQc53KBD/exec";
     
-    let toplamKg = 0;
-    let kalanKg = 0;
     let musteriler = []; // Google Sheets'ten yüklenecek
     let editingMusteriId = null;
-    let currentStepNumber = 1;
-    let selectedIslemler = [];
 
     // Route handling
     function initRouting() {
@@ -514,11 +447,9 @@
       document.getElementById(screenId).classList.remove("hidden");
 
       if (screenId === 'malKabulForm') {
-        // Mal kabul formu açıldığında ilk adıma git
-        currentStepNumber = 1;
-        showStep(1);
-        // Müşteri verilerini yükle
+        // Mal kabul formu açıldığında müşteri verilerini yükle ve bugünkü tarihi set et
         loadAllCustomers();
+        setTodayDate();
       } else if (screenId === 'musteriler') {
         loadMusteriler();
       } else if (screenId === 'bekleyenIsler') {
@@ -528,163 +459,16 @@
       }
     }
 
-    // Adım Adım Süreç Fonksiyonları
-    function showStep(stepNumber) {
-      // Tüm adımları gizle
-      document.querySelectorAll('.step-content').forEach(step => {
-        step.classList.add('hidden');
-      });
+    // Yeni Form İşlevleri
+    function setTodayDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('almaTarihi').value = today;
+    }
+
+    // Form gönderimi işlevi
+    async function submitMalKabulForm(event) {
+      event.preventDefault();
       
-      // Seçilen adımı göster
-      document.getElementById(`step${stepNumber}`).classList.remove('hidden');
-      
-      // Progress bar'ı güncelle
-      const progress = (stepNumber / 4) * 100;
-      document.getElementById('progressBar').style.width = progress + '%';
-      document.getElementById('currentStep').textContent = stepNumber;
-      
-      // Adım başlığını güncelle
-      const stepTitles = {
-        1: 'Müşteri Bilgileri',
-        2: 'Ürün Detayları', 
-        3: 'İşlem Seçimi',
-        4: 'Özet ve Onay'
-      };
-      document.getElementById('stepTitle').textContent = stepTitles[stepNumber];
-      
-      currentStepNumber = stepNumber;
-      
-      // Adım 3'e geçerken kg bilgisini güncelle
-      if (stepNumber === 3) {
-        toplamKg = parseFloat(document.getElementById('toplamKg').value) || 0;
-        kalanKg = toplamKg;
-        document.getElementById('kgBilgi').textContent = toplamKg;
-        document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
-        updateIslemListesi();
-      }
-      
-      // Adım 4'e geçerken özeti güncelle
-      if (stepNumber === 4) {
-        updateSummary();
-      }
-    }
-
-    function nextStep() {
-      if (validateCurrentStep()) {
-        if (currentStepNumber < 4) {
-          showStep(currentStepNumber + 1);
-        }
-      }
-    }
-
-    function prevStep() {
-      if (currentStepNumber > 1) {
-        showStep(currentStepNumber - 1);
-      }
-    }
-
-    function validateCurrentStep() {
-      if (currentStepNumber === 1) {
-        const adsoyad = document.getElementById('adsoyad').value;
-        const cep = document.getElementById('cep').value;
-        const almaTarihi = document.getElementById('almaTarihi').value;
-        const teslimTarihi = document.getElementById('teslimTarihi').value;
-        
-        if (!adsoyad || !cep || !almaTarihi || !teslimTarihi) {
-          alert('Lütfen tüm zorunlu alanları doldurun.');
-          return false;
-        }
-      } else if (currentStepNumber === 2) {
-        const toplamKg = document.getElementById('toplamKg').value;
-        const fiyat = document.getElementById('fiyat').value;
-        
-        if (!toplamKg || !fiyat) {
-          alert('Lütfen toplam ağırlık ve fiyat bilgilerini girin.');
-          return false;
-        }
-      } else if (currentStepNumber === 3) {
-        if (selectedIslemler.length === 0) {
-          alert('Lütfen en az bir işlem türü seçin.');
-          return false;
-        }
-      }
-      return true;
-    }
-
-    function ekleIslem(tip) {
-      if (kalanKg <= 0) {
-        alert("Tüm miktar dağıtıldı.");
-        return;
-      }
-
-      const miktarStr = prompt(tip + ' için kaç kg? (Kalan: ' + kalanKg + ' kg)');
-      const miktar = parseFloat(miktarStr);
-      if (!miktar || isNaN(miktar) || miktar <= 0) return;
-      if (miktar > kalanKg) {
-        alert("Bu kadar kg kalmadı.");
-        return;
-      }
-
-      kalanKg -= miktar;
-      document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
-
-      // İşlemi listeye ekle
-      selectedIslemler.push({ tip: tip, miktar: miktar });
-      updateIslemListesi();
-    }
-
-    function updateIslemListesi() {
-      const islemListesi = document.getElementById('islemListesi');
-      islemListesi.innerHTML = '';
-
-      if (selectedIslemler.length === 0) {
-        islemListesi.innerHTML = '<li class="text-gray-500 text-sm">Henüz işlem seçilmedi</li>';
-        return;
-      }
-
-      selectedIslemler.forEach((islem, index) => {
-        const li = document.createElement('li');
-        li.className = "bg-white shadow p-3 rounded flex justify-between items-center";
-        li.innerHTML = `
-          <span>${islem.tip}: ${islem.miktar} kg</span>
-          <button onclick="removeIslem(${index})" class="text-red-600 hover:text-red-800 text-sm">Sil</button>
-        `;
-        islemListesi.appendChild(li);
-      });
-    }
-
-    function removeIslem(index) {
-      const islem = selectedIslemler[index];
-      kalanKg += islem.miktar;
-      document.getElementById('kalanKg').textContent = kalanKg.toFixed(2);
-      selectedIslemler.splice(index, 1);
-      updateIslemListesi();
-    }
-
-    function updateSummary() {
-      document.getElementById('summaryAdSoyad').textContent = document.getElementById('adsoyad').value;
-      document.getElementById('summaryCep').textContent = document.getElementById('cep').value;
-      document.getElementById('summaryAlmaTarihi').textContent = document.getElementById('almaTarihi').value;
-      document.getElementById('summaryTeslimTarihi').textContent = document.getElementById('teslimTarihi').value;
-      document.getElementById('summaryToplamKg').textContent = document.getElementById('toplamKg').value;
-      document.getElementById('summaryFiyat').textContent = document.getElementById('fiyat').value;
-      document.getElementById('summaryUrunAciklama').textContent = document.getElementById('urunAciklama').value || 'Açıklama yok';
-
-      const summaryIslemler = document.getElementById('summaryIslemler');
-      summaryIslemler.innerHTML = '';
-      
-      if (selectedIslemler.length === 0) {
-        summaryIslemler.innerHTML = '<li class="text-gray-500">İşlem seçilmedi</li>';
-      } else {
-        selectedIslemler.forEach(islem => {
-      const li = document.createElement('li');
-          li.textContent = `${islem.tip}: ${islem.miktar} kg`;
-          summaryIslemler.appendChild(li);
-        });
-      }
-    }
-
-    async function completeMalKabul() {
       // Butonu pasif yap ve loader göster
       const completeButton = document.getElementById('completeButton');
       const buttonText = document.getElementById('completeButtonText');
@@ -696,19 +480,18 @@
       buttonLoader.classList.remove('hidden');
       
       try {
+        // Form verilerini topla
+        const formData = collectFormData();
+        
+        if (!validateForm(formData)) {
+          return;
+        }
+        
         // Mal kabul verilerini Google Sheets'e kaydet
-        await saveMalKabulToSheets();
+        await saveMalKabulToSheets(formData);
         
         // Formu sıfırla
-        document.getElementById('adsoyad').value = '';
-        document.getElementById('cep').value = '';
-        document.getElementById('almaTarihi').value = '';
-        document.getElementById('teslimTarihi').value = '';
-        document.getElementById('toplamKg').value = '';
-        document.getElementById('fiyat').value = '';
-        document.getElementById('urunAciklama').value = '';
-        selectedIslemler = [];
-        currentStepNumber = 1;
+        resetForm();
         
         // Ana menüye dön
         goTo('mainMenu');
@@ -718,9 +501,65 @@
         // Butonu tekrar aktif yap
         completeButton.disabled = false;
         completeButton.classList.remove('opacity-50', 'cursor-not-allowed');
-        buttonText.textContent = 'Tamamla';
+        buttonText.textContent = 'Kaydet';
         buttonLoader.classList.add('hidden');
       }
+    }
+
+    // Form verilerini toplama fonksiyonu
+    function collectFormData() {
+      const formData = {
+        adsoyad: document.getElementById('adsoyad').value,
+        cep: document.getElementById('cep').value,
+        toplamKg: document.getElementById('toplamKg').value,
+        fiyat: document.getElementById('fiyat').value,
+        almaTarihi: document.getElementById('almaTarihi').value,
+        teslimTarihi: document.getElementById('teslimTarihi').value,
+        urunAciklama: document.getElementById('urunAciklama').value,
+        islemler: [],
+        paketler: [],
+        ezmeSecenek: []
+      };
+
+      // İşlem türlerini kontrol et
+      if (document.getElementById('islemKirim').checked) formData.islemler.push('Kırım');
+      if (document.getElementById('islemKavurma').checked) formData.islemler.push('Kavurma');
+      if (document.getElementById('islemEzme').checked) formData.islemler.push('Ezme');
+      if (document.getElementById('islemKP').checked) formData.islemler.push('K+P');
+
+      // Paket seçeneklerini kontrol et
+      if (document.getElementById('paket250').checked) formData.paketler.push('250g');
+      if (document.getElementById('paket400').checked) formData.paketler.push('400g');
+      if (document.getElementById('paket500').checked) formData.paketler.push('500g');
+      if (document.getElementById('paket1000').checked) formData.paketler.push('1000g');
+
+      // Ezme seçeneklerini kontrol et
+      if (document.getElementById('ezme300').checked) formData.ezmeSecenek.push('300g');
+      if (document.getElementById('ezme500').checked) formData.ezmeSecenek.push('500g');
+
+      return formData;
+    }
+
+    // Form doğrulama fonksiyonu
+    function validateForm(formData) {
+      if (!formData.adsoyad || !formData.cep || !formData.toplamKg || !formData.fiyat || 
+          !formData.almaTarihi || !formData.teslimTarihi) {
+        alert('Lütfen tüm zorunlu alanları doldurun.');
+        return false;
+      }
+
+      if (formData.islemler.length === 0 && formData.paketler.length === 0 && formData.ezmeSecenek.length === 0) {
+        alert('Lütfen en az bir işlem türü, paket seçeneği veya ezme seçeneği belirleyin.');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Formu sıfırlama fonksiyonu
+    function resetForm() {
+      document.getElementById('malKabulFormElement').reset();
+      setTodayDate(); // Alım tarihini tekrar bugüne set et
     }
 
     // Müşteri Yönetimi Fonksiyonları
@@ -1112,44 +951,47 @@
       }
     }
 
-    async function saveMalKabulToSheets() {
-      const adsoyad = document.getElementById('adsoyad').value;
-      const cep = document.getElementById('cep').value;
-      const almaTarihi = document.getElementById('almaTarihi').value;
-      const teslimTarihi = document.getElementById('teslimTarihi').value;
-      const fiyat = document.getElementById('fiyat').value;
-      const toplamKg = document.getElementById('toplamKg').value;
-      const urunAciklama = document.getElementById('urunAciklama').value;
-
-      if (!adsoyad || !cep || !almaTarihi || !teslimTarihi || !fiyat || !toplamKg) {
+    async function saveMalKabulToSheets(formData) {
+      if (!formData) {
         return;
       }
 
       // Önce müşteri bilgilerini müşteriler sayfasına kaydet/güncelle ve ID'sini al
-      const musteriId = await saveOrUpdateCustomerFromMalKabul(adsoyad, cep);
-      
+      const musteriId = await saveOrUpdateCustomerFromMalKabul(formData.adsoyad, formData.cep);
       
       if (!musteriId) {
         alert('Müşteri kaydı oluşturulamadı!');
         return;
       }
 
-      // Seçilen işlemleri string olarak birleştir
-      const islemlerStr = selectedIslemler.map(islem => `${islem.tip}: ${islem.miktar}kg`).join(', ');
+      // Seçilen işlemleri, paketleri ve ezme seçeneklerini birleştir
+      const allSelections = [];
+      
+      if (formData.islemler.length > 0) {
+        allSelections.push('İşlemler: ' + formData.islemler.join(', '));
+      }
+      
+      if (formData.paketler.length > 0) {
+        allSelections.push('Paketler: ' + formData.paketler.join(', '));
+      }
+      
+      if (formData.ezmeSecenek.length > 0) {
+        allSelections.push('Ezme: ' + formData.ezmeSecenek.join(', '));
+      }
+      
+      const islemlerStr = allSelections.join(' | ');
 
       const data = {
         type: 'malKabul',
         musteriId: musteriId.toString(), // String olarak gönder
-        almaTarihi: almaTarihi,
-        teslimTarihi: teslimTarihi,
-        toplamKg: toplamKg,
-        fiyat: fiyat,
+        almaTarihi: formData.almaTarihi,
+        teslimTarihi: formData.teslimTarihi,
+        toplamKg: formData.toplamKg,
+        fiyat: formData.fiyat,
         islemler: islemlerStr,
         durum: 'Beklemede',
-        urunAciklama: urunAciklama || ''
+        urunAciklama: formData.urunAciklama || ''
       };
-      
-      
 
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -2356,6 +2198,12 @@
       initRouting();
       // Initialize Lucide icons
       lucide.createIcons();
+      
+      // Mal Kabul Form event listener
+      const malKabulFormElement = document.getElementById('malKabulFormElement');
+      if (malKabulFormElement) {
+        malKabulFormElement.addEventListener('submit', submitMalKabulForm);
+      }
       
       // Müşteri arama input event listener
       const adsoyadInput = document.getElementById('adsoyad');
